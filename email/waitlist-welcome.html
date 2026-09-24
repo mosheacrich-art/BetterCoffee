@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="x-apple-disable-message-reformatting">
+<!--
+  Better Coffee · Waitlist welcome email (Klaviyo)
+  Subject:      We’re almost there… 3, 2, 1 ☕
+  Preview text: You’re on the list, and 15% off is saving your seat.
+
+  Before using: replace IMAGE_URL below with the hosted image URL
+  (upload email/waitlist-welcome.jpg to Klaviyo's image library, or use
+  https://<your-domain>/email/waitlist-welcome.jpg once deployed).
+-->
+<title>We’re almost there… 3, 2, 1</title>
+<style>
+  body { margin:0; padding:0; background:#F1EADF; }
+  img { border:0; display:block; outline:none; text-decoration:none; }
+  a { color:#2E4A2C; }
+  @media (max-width: 620px) {
+    .wrap { width:100% !important; }
+    .pad { padding-left:20px !important; padding-right:20px !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background:#F1EADF;">
+  <!-- Preview text (hidden) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#F1EADF;">
+    You’re on the list, and 15% off is saving your seat.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F1EADF;">
+    <tr>
+      <td align="center" style="padding:24px 0;">
+        <table role="presentation" class="wrap" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background:#F1EADF;">
+
+          <!-- Main visual -->
+          <tr>
+            <td>
+              <a href="https://REPLACE-WITH-YOUR-DOMAIN/" target="_blank" style="text-decoration:none;">
+                <img src="IMAGE_URL" width="600" alt="You’re on the list. Thanks for joining. You’ll get 15% off your first subscription order when we launch. We’ll send your code when we launch." style="width:100%; max-width:600px; height:auto; display:block; border:0; font-family:Arial, sans-serif; font-size:16px; color:#2E4A2C;">
+              </a>
+            </td>
+          </tr>
+
+          <!-- Live text + CTA (keeps the email readable with images off, and helps deliverability) -->
+          <tr>
+            <td class="pad" align="center" style="padding:32px 40px 8px; font-family:Arial, Helvetica, sans-serif; color:#1E2B4F;">
+              <p style="margin:0 0 20px; font-size:16px; line-height:1.5;">
+                Your 15% off code lands in this inbox on launch day. Until then, sit tight: we’re almost there.
+              </p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" bgcolor="#2E4A2C" style="border-radius:9999px;">
+                    <a href="https://REPLACE-WITH-YOUR-DOMAIN/" target="_blank" style="display:inline-block; padding:14px 30px; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#F1EADF; text-decoration:none; border-radius:9999px;">Visit Better Coffee</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer (required: unsubscribe + sender address) -->
+          <tr>
+            <td class="pad" align="center" style="padding:28px 40px 8px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:1.6; color:#1E2B4F; opacity:0.75;">
+              You’re receiving this because you joined the Better Coffee waitlist.<br>
+              {{ organization.name }} · {{ organization.full_address }}<br>
+              {% unsubscribe 'Unsubscribe' %}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
