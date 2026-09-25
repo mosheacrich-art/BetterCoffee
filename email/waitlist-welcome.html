@@ -57,12 +57,10 @@
             </td>
           </tr>
 
-          <!-- Footer (required: unsubscribe + sender address) -->
+          <!-- Footer (legally required: sender address + unsubscribe), kept small -->
           <tr>
-            <td class="pad" align="center" style="padding:28px 40px 8px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:1.6; color:#1E2B4F; opacity:0.75;">
-              You’re receiving this because you joined the Better Coffee waitlist.<br>
-              {{ organization.name }} · {{ organization.full_address }}<br>
-              {% unsubscribe 'Unsubscribe' %}
+            <td class="pad" align="center" style="padding:24px 40px 0; font-family:Arial, Helvetica, sans-serif; font-size:11px; line-height:1.5; color:#8A8577;">
+              Better Coffee · Gran Via de Carles III, 124, entresuelo 3, 08034 Barcelona · {% unsubscribe 'Unsubscribe' %}
             </td>
           </tr>
 
