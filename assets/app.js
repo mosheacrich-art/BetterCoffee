@@ -286,36 +286,26 @@
   }
 
 
-  const EXTRA = {
-    en: {
-      specSugar: 'Sugar', specTheanine: 'L-theanine', specCan: 'Can', specBase: 'Base', specBaseVal: 'Oat milk',
-      receiptTitle: 'Order preview',
-      factsTitle: 'Functional facts', factsSub: 'Per can · 200 ml',
-      fCaffeine: 'Caffeine', fTheanine: 'L-theanine', fSugar: 'Sugar', fDairy: 'Dairy', fDairyVal: '0g · oat milk', fStack: 'Functional stack',
-      factsNote: 'High caffeine content. Not recommended for children or pregnant or breast-feeding women.',
-      mxIng: 'Ingredient', mxWhat: 'What it is',
-      usual: 'The usual',
-      rFlavor: 'Flavor', rBox: 'Box', rPrice: 'Price', rPerCan: 'Per can', rPerk: 'Waitlist perk', rPerkVal: '15% off subs', rToday: 'Due today',
-      badge: '15% OFF · JOIN THE WAITLIST · ',
-      count: '{n} / 03',
-    },
-    es: {
-      specSugar: 'Azúcar', specTheanine: 'L-teanina', specCan: 'Lata', specBase: 'Base', specBaseVal: 'Avena',
-      receiptTitle: 'Resumen del pedido',
-      factsTitle: 'Datos funcionales', factsSub: 'Por lata · 200 ml',
-      fCaffeine: 'Cafeína', fTheanine: 'L-teanina', fSugar: 'Azúcar', fDairy: 'Lácteos', fDairyVal: '0 g · avena', fStack: 'Mezcla funcional',
-      factsNote: 'Contenido elevado de cafeína. No recomendado para niños ni mujeres embarazadas o en periodo de lactancia.',
-      mxIng: 'Ingrediente', mxWhat: 'Qué es',
-      usual: 'Lo de siempre',
-      rFlavor: 'Sabor', rBox: 'Caja', rPrice: 'Precio', rPerCan: 'Por lata', rPerk: 'Ventaja lista', rPerkVal: '15% dto. subs', rToday: 'A pagar hoy',
-      badge: '15% DTO · ÚNETE A LA LISTA · ',
-      count: '{n} / 03',
-    },
-  };
-  Object.assign(T.en, EXTRA.en);
-  Object.assign(T.es, EXTRA.es);
+  Object.assign(T.en, {
+    joinShort: 'Get 15% off', reserveCta: 'Reserve my box', rToday: 'Due today',
+    heroDone: 'You’re on the list. Your 15% off is saved.',
+    stackCoffee: 'coffee', crateCap: '{n} × {flavor}', count: '{n} / 03',
+  });
+  Object.assign(T.es, {
+    joinShort: 'Quiero mi 15%', reserveCta: 'Reservar mi caja', rToday: 'A pagar hoy',
+    heroDone: 'Ya estás en la lista. Tu 15% está guardado.',
+    stackCoffee: 'café', crateCap: '{n} × {flavor}', count: '{n} / 03',
+  });
+  const TONE_OF = { focus: 'cream', calm: 'green', energy: 'violet' };
+  state.orbit = 'all';
+  state.orb = 'cold-brew-coffee';
+  state.cmp = 'them';
 
-  /* ---------- Static text ---------- */
+  /* ---------- Text ---------- */
+  function split(el) {
+    const words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map((w, i) => '<span class="sw"><span style="--i:' + i + '">' + esc(w) + '</span></span>').join(' ');
+  }
   function renderStatic() {
     const t = tx();
     document.documentElement.lang = state.lang;
@@ -323,189 +313,183 @@
       const v = t[el.getAttribute('data-i18n')];
       if (typeof v === 'string') el.textContent = v.replace(/<\/?em>/g, '');
     });
+    $$('[data-split]').forEach(split);
     $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t[el.getAttribute('data-i18n-ph')]; });
     $$('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t[el.getAttribute('data-i18n-aria')]); });
-    $$('.hc').forEach((img) => { const k = img.className.match(/hc-(\w+)/)[1]; img.alt = fill(t.canAlt, { name: FLAVORS[k].name }); });
+    $('[data-lang-label]').textContent = state.lang === 'es' ? 'EN' : 'ES';
     $$('[data-set-lang]').forEach((b) => b.classList.toggle('is-on', b.dataset.setLang === state.lang));
-    const bp = $('[data-badge]'); bp.textContent = t.badge; bp.setAttribute('textLength', '462'); bp.setAttribute('lengthAdjust', 'spacing');
+    $$('[data-mg]').forEach((el) => { el.textContent = mg(FLAVORS[el.dataset.mg].caffeine, state.lang); });
+    $$('.hcan img').forEach((img) => { img.alt = fill(t.canAlt, { name: FLAVORS[img.parentElement.dataset.heroCan].name }); });
 
-    const ann = new Array(8).fill('<span>' + esc(t.announce) + '</span><span>✦</span>').join('');
-    $('[data-announce]').innerHTML = ann;
-    const run = MARQUEE[state.lang].concat(MARQUEE[state.lang]);
-    $('[data-marquee]').innerHTML = run.map((s) => '<span class="t-item">' + esc(s) + '</span><span class="t-sep">//</span>').join('');
+    const g = state.lang === 'es' ? '0 g' : '0g';
+    $('[data-hero-facts]').innerHTML = [[g, t.proofSugar], [mg(100, state.lang), t.proofTheanine], ['100%', t.proofArabica], ['0', t.proofDairy]]
+      .map((f) => '<li><b>' + esc(f[0]) + '</b><span>' + esc(f[1]) + '</span></li>').join('');
 
-    const words = t.tagline.replace(/<\/?em>/g, '').split(' ');
-    $('[data-statement]').innerHTML = words.map((w) => {
-      const hl = w.indexOf('10/10') > -1 ? ' hl' : '';
-      const can = /,$/.test(w) ? ' <img class="inline-can" src="' + IMG_SM('energy') + '" alt="" width="240" height="573">' : '';
-      return '<span class="w' + hl + '">' + esc(w) + '</span>' + can;
-    }).join(' ');
+    $('[data-statement]').innerHTML = esc(t.tagline.replace(/<\/?em>/g, '')).replace('10/10', '<mark>10/10</mark>');
 
-    $('[data-stats]').innerHTML = t.stats.map((s) => '<div class="stat"><strong>' + esc(s[0]) + '</strong><span>' + esc(s[1]) + '</span></div>').join('');
+    $('[data-counts]').innerHTML = t.stats.map((s) => {
+      const m = s[0].match(/^(\d+)(.*)$/);
+      return '<div class="count"><b data-count="' + (m ? m[1] : '') + '" data-suffix="' + esc(m ? m[2] : '') + '">' + esc(s[0]) + '</b><span>' + esc(s[1]) + '</span></div>';
+    }).join('');
+    countsDone = false;
 
     $('[data-faq]').innerHTML = FAQ[state.lang].map((f, i) =>
-      '<details' + (i === 0 ? ' open' : '') + '><summary><span>' + esc(f[0]) + '</span><span class="faq-tog" aria-hidden="true"></span></summary><p class="faq-a">' + esc(f[1]) + '</p></details>'
+      '<details' + (i === 0 ? ' open' : '') + '><summary><span>' + esc(f[0]) + '</span><span class="faq-x" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="faq-a">' + esc(f[1]) + '</p></details>'
     ).join('');
-
-    const rows = COMPARE[state.lang];
-    const card = (cls, title, idx) => '<div class="vs-card ' + cls + '"><p class="vs-title">' + esc(title) + '</p><dl>' +
-      rows.map((r) => '<div class="vs-row"><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[idx]) + '</dd></div>').join('') + '</dl></div>';
-    $('[data-versus]').innerHTML = card('them', t.usual, 1) + card('us', 'Better Coffee', 2);
-
-    renderMatrix();
   }
 
-  /* ---------- Functional facts label ---------- */
-  function factsHTML(k) {
+  /* ---------- Lineup panels ---------- */
+  function renderPanels() {
     const t = tx();
-    const f = fl(k);
-    return '<p class="facts-title">' + esc(t.factsTitle) + '</p>' +
-      '<p class="facts-sub">' + esc(f.name) + ' · ' + esc(t.factsSub) + '</p>' +
-      '<div class="facts-row"><b>' + esc(t.fCaffeine) + '</b><b>' + mg(f.caffeine, state.lang) + '</b></div>' +
-      '<div class="facts-row"><b>' + esc(t.fTheanine) + '</b><b>' + mg(100, state.lang) + '</b></div>' +
-      '<div class="facts-row"><span>' + esc(t.fSugar) + '</span><span>' + (state.lang === 'es' ? '0 g' : '0g') + '</span></div>' +
-      '<div class="facts-row thick"><span>' + esc(t.fDairy) + '</span><span>' + esc(t.fDairyVal) + '</span></div>' +
-      '<div class="facts-bot"><b>' + esc(t.fStack) + '</b>' + esc(f.ingredients.join(', ')) + '</div>' +
-      '<p class="facts-note">' + esc(t.factsNote) + '</p>';
-  }
-
-  /* ---------- Story ---------- */
-  let storyIdx = -1;
-  function renderStory(idx, animate) {
-    const t = tx();
-    const k = ORDER[idx];
-    const f = fl(k);
-    const story = $('[data-story]');
-    story.style.setProperty('--s-bg', f.bg);
-    story.style.setProperty('--s-ink', f.ink);
-    $('[data-story-count]').textContent = fill(t.count, { n: String(idx + 1).padStart(2, '0') });
-    $('[data-story-when]').textContent = f.when;
-    $('[data-story-name]').textContent = f.name;
-    $('[data-story-tag]').textContent = f.tag;
-    $('[data-story-for]').textContent = f.for;
-    const cta = $('[data-story-cta]');
-    cta.textContent = t.reserve + ' ' + f.name;
-    cta.dataset.reserveFlavor = k;
-    $('[data-story-facts]').innerHTML = factsHTML(k);
-    $$('[data-story-can]').forEach((img) => img.classList.toggle('is-on', img.dataset.storyCan === k));
-    $$('[data-story-nav] button').forEach((b, i) => b.classList.toggle('is-on', i === idx));
-    if (animate && !reduceMotion) {
-      const copy = $('.story-copy');
-      copy.classList.remove('story-swap'); void copy.offsetWidth; copy.classList.add('story-swap');
-    }
-  }
-  function renderStoryChrome() {
-    $('[data-story-nav]').innerHTML = ORDER.map((k, i) =>
-      '<button type="button" data-story-go="' + i + '"><span>' + String(i + 1).padStart(2, '0') + ' ' + esc(FLAVORS[k].name) + '</span><span>' + mg(FLAVORS[k].caffeine, state.lang) + '</span></button>'
-    ).join('');
-    const t = tx();
-    $('[data-story-mobile]').innerHTML = ORDER.map((k, i) => {
+    $('[data-hs-track]').innerHTML = ORDER.map((k, i) => {
       const f = fl(k);
-      return '<div class="sm-panel" style="--s-bg:' + f.bg + ';--s-ink:' + f.ink + '">' +
-        '<p class="mono-label">' + fill(t.count, { n: String(i + 1).padStart(2, '0') }) + ' · ' + esc(f.when) + '</p>' +
-        '<h3 class="story-name">' + esc(f.name) + '</h3>' +
-        '<p class="story-tag">' + esc(f.tag) + '</p>' +
-        '<p class="story-for">' + esc(f.for) + '</p>' +
-        '<a href="#reserve" class="btn btn-stage" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a>' +
-        '<div class="facts">' + factsHTML(k) + '</div>' +
-        '<div class="sm-can"><img src="' + IMG(k) + '" alt="' + esc(fill(t.canAlt, { name: f.name })) + '" width="462" height="1104" loading="lazy"></div>' +
-      '</div>';
+      const stack = [t.stackCoffee].concat(f.ingredients);
+      return '<article class="panel" data-panel="' + k + '" style="--p-bg:' + f.bg + ';--p-ink:' + f.ink + '">' +
+        '<div class="panel-top"><span class="kicker">' + fill(t.count, { n: String(i + 1).padStart(2, '0') }) + ' · ' + esc(f.when) + '</span><span class="kicker">' + esc(t.lineupEyebrow) + '</span></div>' +
+        '<p class="panel-for">' + esc(f.for) + '</p>' +
+        '<h2 class="panel-name">' + esc(f.name) + '.</h2>' +
+        '<img class="panel-can" src="' + IMG(k) + '" width="462" height="1104" alt="' + esc(fill(t.canAlt, { name: f.name })) + '" loading="lazy">' +
+        '<div class="panel-stack"><ul class="stack-list">' + stack.map((s) => '<li>' + esc(s) + '.</li>').join('') + '</ul>' +
+          '<p class="panel-tag">' + esc(f.tag) + '</p>' +
+          '<div class="panel-meta"><span class="panel-mg">' + mg(f.caffeine, state.lang) + '<small>' + esc(t.caffeineShort) + '</small></span>' +
+          '<a href="#reserve" class="pill" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a></div>' +
+        '</div></article>';
     }).join('');
-    storyIdx = -1;
   }
-  function storyProgress() {
-    const story = $('[data-story]');
-    const r = story.getBoundingClientRect();
+  let hsSpan = 0;
+  function updateHS() {
+    const hs = $('[data-hs]');
+    if (window.innerWidth < 900) { hs.style.removeProperty('--x'); return null; }
+    const track = $('[data-hs-track]');
+    const r = hs.getBoundingClientRect();
     const span = r.height - window.innerHeight;
-    return span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+    const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+    hsSpan = track.scrollWidth - window.innerWidth;
+    track.style.setProperty('--x', (-p * hsSpan).toFixed(1) + 'px');
+    $('[data-hs-bar]').style.setProperty('--p', p.toFixed(3));
+    const active = r.top <= 1 && r.bottom >= window.innerHeight - 1;
+    return active ? ORDER[Math.min(2, Math.round(p * 2))] : null;
   }
-  function updateStory() {
-    const p = storyProgress();
-    const idx = Math.min(ORDER.length - 1, Math.floor(p * ORDER.length));
-    if (idx !== storyIdx) { renderStory(idx, storyIdx !== -1); storyIdx = idx; }
-    $$('[data-story-nav] button').forEach((b, i) => {
-      const local = Math.min(1, Math.max(0, p * ORDER.length - i));
-      b.style.setProperty('--p', (local * 100).toFixed(1) + '%');
+  function goPanel(k) {
+    const i = ORDER.indexOf(k);
+    const hs = $('[data-hs]');
+    if (window.innerWidth < 900) {
+      hs.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+      const panel = $('[data-panel="' + k + '"]');
+      const track = $('[data-hs-track]');
+      track.scrollTo({ left: panel.offsetLeft - (track.clientWidth - panel.clientWidth) / 2, behavior: 'smooth' });
+      return;
+    }
+    const span = hs.offsetHeight - window.innerHeight;
+    window.scrollTo({ top: hs.getBoundingClientRect().top + window.scrollY + span * (i / 2), behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+
+  /* ---------- Orbit ---------- */
+  function renderOrbit(animate) {
+    const t = tx();
+    $('[data-orbit-tabs]').innerHTML = ['all'].concat(ORDER).map((k) =>
+      '<button type="button" role="tab" class="seg-btn' + (k === state.orbit ? ' is-on' : '') + '" aria-selected="' + (k === state.orbit) + '" data-orbit-tab="' + k + '">' + esc(k === 'all' ? t.all : FLAVORS[k].name) + '</button>'
+    ).join('');
+    const list = INGREDIENTS.filter((x) => state.orbit === 'all' || x.in.indexOf('all') > -1 || x.in.indexOf(state.orbit) > -1);
+    if (!list.some((x) => x.id === state.orb)) state.orb = list[0].id;
+    const core = $('[data-orbit-core]');
+    core.classList.toggle('is-trio', state.orbit === 'all');
+    core.innerHTML = (state.orbit === 'all' ? ['calm', 'focus', 'energy'] : [state.orbit]).map((k) => '<img src="' + IMG(k) + '" width="462" height="1104" alt="">').join('');
+    const orbit = $('[data-orbit]');
+    $$('.orb', orbit).forEach((o) => o.remove());
+    const n = list.length;
+    list.forEach((x0, i) => {
+      const x = Object.assign({}, x0, x0[state.lang]);
+      const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'orb' + (x.id === state.orb ? ' is-on' : '');
+      b.dataset.orb = x.id;
+      b.style.cssText = '--x:' + (50 + 43 * Math.cos(a)).toFixed(2) + '%;--y:' + (50 + 41 * Math.sin(a)).toFixed(2) + '%;--i:' + (animate ? i : 0) + ';--ob:' + x.bg;
+      b.innerHTML = '<span class="orb-photo"><img src="/assets/img/ingredients/' + x.id + '.webp" alt="" loading="lazy"></span><span class="orb-name">' + esc(x.name) + '</span>';
+      orbit.appendChild(b);
+    });
+    renderOrbDetail();
+  }
+  function renderOrbDetail() {
+    const t = tx();
+    const x0 = INGREDIENTS.find((x) => x.id === state.orb);
+    const x = Object.assign({}, x0, x0[state.lang]);
+    $$('.orb').forEach((o) => o.classList.toggle('is-on', o.dataset.orb === state.orb));
+    const tags = x.in.map((k) => {
+      const c = k === 'all' ? { bg: '#1E2B4F', ink: '#F1EADF', name: t.every } : FLAVORS[k];
+      return '<span class="od-tag" style="--tb:' + c.bg + ';--ti:' + c.ink + '">' + esc(c.name) + '</span>';
+    }).join('');
+    $('[data-orbit-detail]').innerHTML = '<div class="od-swap">' + (x.dose ? '<p class="od-dose">' + esc(x.dose) + '</p>' : '') +
+      '<h3 class="od-name">' + esc(x.name) + '.</h3><p class="od-does" style="margin-top:12px">' + esc(x.does) + '</p><div class="od-tags" style="margin-top:16px">' + tags + '</div></div>';
+  }
+
+  /* ---------- Compare switch ---------- */
+  function renderCmp(animate) {
+    const sw = $('.switch');
+    sw.dataset.side = state.cmp;
+    $$('.switch-opt').forEach((b) => b.classList.toggle('is-on', b.dataset.cmp === state.cmp));
+    const us = state.cmp === 'us';
+    const dl = $('[data-cmp-rows]');
+    dl.className = 'cmp ' + (us ? 'is-us' : 'is-them') + (animate ? ' cmp-swap' : '');
+    dl.innerHTML = COMPARE[state.lang].map((r, i) => '<div class="cmp-row"><dt>' + esc(r[0]) + '</dt><dd style="--i:' + i + '"><i aria-hidden="true">' + (us ? '✓' : '✕') + '</i><span>' + esc(us ? r[2] : r[1]) + '</span></dd></div>').join('');
+  }
+
+  /* ---------- Counters ---------- */
+  let countsDone = false;
+  function runCounts() {
+    countsDone = true;
+    $$('[data-count]').forEach((el) => {
+      const end = +el.dataset.count;
+      const suf = el.dataset.suffix;
+      if (!end || reduceMotion) return;
+      const t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / 1400);
+        el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))) + suf;
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
     });
   }
-  function goStory(i) {
-    const story = $('[data-story]');
-    const span = story.offsetHeight - window.innerHeight;
-    const top = story.getBoundingClientRect().top + window.scrollY + span * ((i + 0.15) / ORDER.length);
-    window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
-  }
 
-  /* ---------- Statement fill ---------- */
-  function updateStatement() {
-    const el = $('[data-statement]');
-    const r = el.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
-    const ws = $$('.w', el);
-    const n = Math.round(p * ws.length);
-    ws.forEach((w, i) => w.classList.toggle('on', i < n));
-  }
-
-  /* ---------- Matrix ---------- */
-  function renderMatrix() {
-    const t = tx();
-    const head = '<div class="mx-row mx-head" role="row"><span role="columnheader">' + esc(t.mxIng) + '</span><span class="mx-d" role="columnheader">' + esc(t.mxWhat) + '</span>' +
-      ORDER.map((k) => '<span class="mx-c" role="columnheader"><span class="mx-flavor" style="--d:' + FLAVORS[k].bg + '"><i></i>' + esc(FLAVORS[k].name) + '</span></span>').join('') + '</div>';
-    const rows = INGREDIENTS.map((x0) => {
-      const x = Object.assign({}, x0, x0[state.lang]);
-      return '<div class="mx-row" role="row">' +
-        '<div class="mx-name" role="cell"><span class="mx-photo" style="--ing-bg:' + x.bg + '"><img src="' + '/assets/img/ingredients/' + x.id + '.webp" alt="" loading="lazy"></span><div><h3>' + esc(x.name) + '</h3>' + (x.dose ? '<span class="mx-dose">' + esc(x.dose) + '</span>' : '') + '</div></div>' +
-        '<p class="mx-desc" role="cell">' + esc(x.does) + '</p>' +
-        ORDER.map((k) => {
-          const has = x.in.indexOf('all') > -1 || x.in.indexOf(k) > -1;
-          return '<span class="mx-c" role="cell" aria-label="' + esc(FLAVORS[k].name + (has ? ' ✓' : ' –')) + '">' + (has ? '<span class="dot" style="--d:' + FLAVORS[k].bg + '"></span>' : '<span class="dash"></span>') + '</span>';
-        }).join('') +
-      '</div>';
-    }).join('');
-    $('[data-matrix]').innerHTML = head + rows;
-  }
-
-  /* ---------- Order ---------- */
-  function renderOrder() {
-    const t = tx();
-    const f = fl(state.flavor);
-    const p = plan(PLANS.find((x) => x.id === state.plan));
-    $('[data-flavor-opts]').innerHTML = ORDER.map((k) => {
-      const on = k === state.flavor;
-      return '<button type="button" class="tile' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-flavor="' + k + '" style="--t-bg:' + FLAVORS[k].bg + ';--t-ink:' + FLAVORS[k].ink + '">' +
-        '<span class="tile-name">' + esc(FLAVORS[k].name) + '</span><span class="tile-mg">' + mg(FLAVORS[k].caffeine, state.lang) + ' ' + esc(t.caffeineShort) + '</span>' +
-        '<img src="' + IMG_SM(k) + '" alt="" width="240" height="573">' +
-        '<span class="tile-check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></button>';
-    }).join('');
-    $('[data-plans]').innerHTML = PLANS.map((p0) => {
-      const x = plan(p0);
-      const on = x.id === state.plan;
-      return '<button type="button" class="plan' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-plan="' + x.id + '"><span class="box" aria-hidden="true"></span>' +
-        '<span class="plan-main"><span class="plan-name">' + esc(x.name) + (x.badge ? '<span class="tagb">' + esc(x.badge) + '</span>' : '') + '</span><span class="plan-note">' + esc(x.note) + '</span></span>' +
-        '<span class="plan-price">' + (x.compare ? '<s>' + money(x.compare, state.lang) + '</s>' : '') + '<strong>' + money(x.price, state.lang) + '</strong><small>' + (x.monthly ? esc(t.perMonth) + ' · ' : '') + money(x.price / x.cans, state.lang) + ' ' + esc(t.perCan) + '</small></span></button>';
-    }).join('');
-
-    const line = (a, b, cls) => '<div class="r-line' + (cls ? ' ' + cls : '') + '"><span>' + esc(a) + '</span><i></i><span>' + esc(b) + '</span></div>';
-    $('[data-receipt]').innerHTML =
-      line(t.rFlavor, f.name) +
-      line(t.rBox, p.name) +
-      line(t.rPrice, money(p.price, state.lang) + (p.monthly ? t.perMonth : '')) +
-      line(t.rPerCan, money(p.price / p.cans, state.lang)) +
-      line(t.rPerk, t.rPerkVal, 'r-perk') +
-      line(t.rToday, money(0, state.lang), 'r-total');
-
-    $('[data-join="reserve"]').hidden = state.reserved;
-    $('[data-success]').hidden = !state.reserved;
-    if (state.reserved) $('[data-confirm]').textContent = fill(t.confirm, { email: state.reservedEmail, summary: summary() });
-  }
+  /* ---------- Reserve ---------- */
   function summary() {
     const t = tx();
     const f = fl(state.flavor);
     const p = plan(PLANS.find((x) => x.id === state.plan));
     return fill(t.summary, { flavor: f.name, plan: p.name.toLowerCase(), price: money(p.price, state.lang) + (p.monthly ? t.perMonth : '') });
   }
+  function renderReserve(refill) {
+    const t = tx();
+    const f = fl(state.flavor);
+    const p = plan(PLANS.find((x) => x.id === state.plan));
+    if (refill !== false) {
+      let html = '';
+      for (let i = 0; i < 12; i++) {
+        html += i < p.cans ? '<span class="slot"><img src="' + IMG_SM(state.flavor) + '" alt="" width="240" height="573" style="--i:' + i + '"></span>' : '<span class="slot is-empty"></span>';
+      }
+      $('[data-crate]').innerHTML = html;
+    }
+    $('[data-crate-cap]').innerHTML = '<b>' + esc(fill(t.crateCap, { n: p.cans, flavor: f.name })) + '</b><span>' + money(p.price / p.cans, state.lang) + ' ' + esc(t.perCan) + '</span>';
+    $('[data-flavor-opts]').innerHTML = ORDER.map((k) =>
+      '<button type="button" class="flav-btn' + (k === state.flavor ? ' is-on' : '') + '" aria-pressed="' + (k === state.flavor) + '" data-flavor="' + k + '" style="--fb:' + FLAVORS[k].bg + '"><i></i>' + esc(FLAVORS[k].name) + '</button>'
+    ).join('');
+    $('[data-plans]').innerHTML = PLANS.map((p0) => {
+      const x = plan(p0);
+      const on = x.id === state.plan;
+      return '<button type="button" class="plan' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-plan="' + x.id + '">' +
+        '<span class="plan-main"><span class="plan-name">' + esc(x.name) + (x.badge ? '<span class="badge">' + esc(x.badge) + '</span>' : '') + '</span><span class="plan-note">' + esc(x.note) + '</span></span>' +
+        '<span class="plan-price">' + (x.compare ? '<s>' + money(x.compare, state.lang) + '</s>' : '') + '<strong>' + money(x.price, state.lang) + (x.monthly ? '<small>' + esc(t.perMonth) + '</small>' : '') + '</strong><small>' + money(x.price / x.cans, state.lang) + ' ' + esc(t.perCan) + '</small></span></button>';
+    }).join('');
+    $('[data-today]').textContent = money(0, state.lang);
+    $('[data-reserving]').textContent = fill(t.reserving, { summary: summary() });
+    $('[data-join="reserve"]').hidden = state.reserved;
+    $('[data-success]').hidden = !state.reserved;
+    if (state.reserved) $('[data-confirm]').textContent = fill(t.confirm, { email: state.reservedEmail, summary: summary() });
+  }
 
-  /* ---------- Account drawer ---------- */
+  /* ---------- Account ---------- */
   function renderAccount() {
     const joined = !!state.joinedEmail;
     $('[data-account-joined]').hidden = !joined;
@@ -518,8 +502,6 @@
     $('[data-overlay]').classList.add('is-open');
     $('[data-drawer]').classList.add('is-open');
     document.body.style.overflow = 'hidden';
-    const input = $('#account-email');
-    if (input && !state.joinedEmail && !input.value) input.value = $('#reserve-email').value;
     setTimeout(() => { const c = $('[data-drawer] .drawer-close'); if (c) c.focus(); }, 50);
   }
   function closeDrawer() {
@@ -533,49 +515,101 @@
     const input = form.querySelector('input[type="email"]');
     const email = (input.value || '').trim();
     const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    input.classList.toggle('is-invalid', !ok);
+    const box = form.classList.contains('capture') ? form : input;
+    box.classList.toggle('is-invalid', !ok);
     if (!ok) { input.focus(); return; }
     subscribe(email);
-    if (form.dataset.join === 'reserve') { state.reserved = true; state.reservedEmail = email; renderOrder(); }
-    if (form.dataset.join === 'final') { form.hidden = true; $('[data-final-done]').hidden = false; }
+    const kind = form.dataset.join;
+    if (kind === 'reserve') { state.reserved = true; state.reservedEmail = email; renderReserve(false); }
+    if (kind === 'final') { form.hidden = true; $('[data-final-done]').hidden = false; }
+    if (kind === 'hero') { form.hidden = true; $('[data-hero-note]').hidden = true; const d = $('[data-hero-done]'); d.textContent = tx().heroDone; d.hidden = false; }
   }
 
-  function renderAll() {
+  /* ---------- Scroll ---------- */
+  let io = null;
+  function observe() {
+    if (!('IntersectionObserver' in window) || reduceMotion) { $$('[data-split]').forEach((e) => e.classList.add('is-in')); return; }
+    if (!io) io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { threshold: 0.2 });
+    $$('[data-split]:not(.is-in)').forEach((e) => io.observe(e));
+  }
+  let tone = 'cream';
+  let cmpFlipped = false;
+  function onScroll() {
+    ticking = false;
+    const vh = window.innerHeight;
+    const mid = vh * 0.5;
+    let next = null;
+    const hsTone = updateHS();
+    if (hsTone) next = TONE_OF[hsTone];
+    if (!next) {
+      $$('[data-tone-section]').forEach((s) => { const r = s.getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) next = s.dataset.toneSection; });
+      if (!next && window.innerWidth < 900) { const r = $('[data-hs]').getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) next = 'cream'; }
+    }
+    if (next && next !== tone) { tone = next; document.body.dataset.tone = tone; }
+
+    $$('[data-par]').forEach((el) => {
+      const r = el.parentElement.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      el.style.setProperty('--py', (((r.top + r.height / 2) - mid) * +el.dataset.par).toFixed(1) + 'px');
+    });
+
+    const counts = $('[data-counts]').getBoundingClientRect();
+    if (!countsDone && counts.top < vh * 0.85) runCounts();
+    const sw = $('.switch').getBoundingClientRect();
+    if (!cmpFlipped && sw.top < vh * 0.7) { cmpFlipped = true; setTimeout(() => { if (state.cmp === 'them') { state.cmp = 'us'; renderCmp(true); } }, 1100); }
+
+    const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < vh && r.bottom > 0; };
+    $('[data-dock]').classList.toggle('is-on', $('.hero').getBoundingClientRect().bottom < 0 && !inView($('#reserve')) && !inView($('.footer')));
+  }
+  let ticking = false;
+
+  function setupTilt() {
+    const hero = $('.hero');
+    const cans = $$('.hcan');
+    if (reduceMotion || !window.matchMedia('(pointer: fine)').matches) return;
+    hero.addEventListener('mousemove', (e) => {
+      const r = hero.getBoundingClientRect();
+      const dx = (e.clientX - r.left) / r.width - 0.5;
+      const dy = (e.clientY - r.top) / r.height - 0.5;
+      cans.forEach((c, i) => {
+        const m = [1.2, 0.8, 1.2][i];
+        c.style.setProperty('--ry', (dx * 22 * m).toFixed(2) + 'deg');
+        c.style.setProperty('--rx', (-dy * 10 * m).toFixed(2) + 'deg');
+      });
+    });
+    hero.addEventListener('mouseleave', () => cans.forEach((c) => { c.style.setProperty('--ry', '0deg'); c.style.setProperty('--rx', '0deg'); }));
+  }
+
+  function renderAll(animate) {
     renderStatic();
-    renderStoryChrome();
-    renderOrder();
+    renderPanels();
+    renderOrbit(animate);
+    renderCmp(false);
+    renderReserve(true);
     renderAccount();
+    observe();
+    $$('[data-split]').forEach((e) => { const r = e.getBoundingClientRect(); if (r.top < window.innerHeight && r.bottom > 0) e.classList.add('is-in'); });
     onScroll();
   }
   function setLang(lang) {
     state.lang = lang;
     store.set('bc-lang', lang);
-    renderAll();
-  }
-
-  /* ---------- Scroll ---------- */
-  let ticking = false;
-  function onScroll() {
-    ticking = false;
-    $('.nav').classList.toggle('is-scrolled', window.scrollY > 40);
-    if (window.innerWidth >= 900) updateStory();
-    if (reduceMotion) $$('[data-statement] .w').forEach((w) => w.classList.add('on')); else updateStatement();
-    const vh = window.innerHeight;
-    const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < vh && r.bottom > 0; };
-    const pastHero = $('.hero').getBoundingClientRect().bottom < 0;
-    $('[data-sticky-cta]').classList.toggle('is-on', pastHero && !inView($('#reserve')) && !inView($('.footer')));
+    renderAll(false);
   }
 
   function setupEvents() {
     window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
     window.addEventListener('resize', () => requestAnimationFrame(onScroll));
     document.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-reserve-flavor],[data-flavor],[data-plan],[data-story-go],[data-open-account],[data-close-drawer],[data-set-lang],[data-toggle-lang],[data-forget],[data-overlay]');
+      const el = e.target.closest('[data-reserve-flavor],[data-flavor],[data-plan],[data-hero-can],[data-orbit-tab],[data-orb],[data-cmp],[data-open-account],[data-close-drawer],[data-set-lang],[data-toggle-lang],[data-forget],[data-overlay]');
       if (!el) return;
-      if (el.matches('[data-reserve-flavor]')) { state.flavor = el.dataset.reserveFlavor; renderOrder(); return; }
-      if (el.matches('[data-flavor]')) { state.flavor = el.dataset.flavor; renderOrder(); return; }
-      if (el.matches('[data-plan]')) { state.plan = el.dataset.plan; renderOrder(); return; }
-      if (el.matches('[data-story-go]')) { goStory(+el.dataset.storyGo); return; }
+      if (el.matches('[data-reserve-flavor]')) { state.flavor = el.dataset.reserveFlavor; renderReserve(true); return; }
+      if (el.matches('[data-flavor]')) { if (state.flavor !== el.dataset.flavor) { state.flavor = el.dataset.flavor; renderReserve(true); } return; }
+      if (el.matches('[data-plan]')) { if (state.plan !== el.dataset.plan) { state.plan = el.dataset.plan; renderReserve(true); } return; }
+      if (el.matches('[data-hero-can]')) { goPanel(el.dataset.heroCan); return; }
+      if (el.matches('[data-orbit-tab]')) { state.orbit = el.dataset.orbitTab; renderOrbit(true); return; }
+      if (el.matches('[data-orb]')) { state.orb = el.dataset.orb; renderOrbDetail(); return; }
+      if (el.matches('[data-cmp]')) { cmpFlipped = true; if (state.cmp !== el.dataset.cmp) { state.cmp = el.dataset.cmp; renderCmp(true); } return; }
       if (el.matches('[data-open-account]')) { openDrawer(); return; }
       if (el.matches('[data-close-drawer]') || el.matches('[data-overlay]')) { closeDrawer(); return; }
       if (el.matches('[data-set-lang]')) { setLang(el.dataset.setLang); return; }
@@ -585,9 +619,13 @@
         state.joinedEmail = '';
         state.reserved = false;
         renderAccount();
-        renderOrder();
+        renderReserve(false);
         const i = $('#account-email'); if (i) { i.value = ''; i.focus(); }
       }
+    });
+    document.addEventListener('mouseover', (e) => {
+      const o = e.target.closest('[data-orb]');
+      if (o && o.dataset.orb !== state.orb && window.matchMedia('(pointer: fine)').matches) { state.orb = o.dataset.orb; renderOrbDetail(); }
     });
     document.addEventListener('submit', (e) => {
       const form = e.target.closest('[data-join]');
@@ -596,7 +634,8 @@
       handleJoin(form);
     });
     document.addEventListener('input', (e) => {
-      if (e.target.classList && e.target.classList.contains('is-invalid')) e.target.classList.remove('is-invalid');
+      const c = e.target.closest('.is-invalid') || (e.target.classList.contains('is-invalid') ? e.target : null);
+      if (c) c.classList.remove('is-invalid');
     });
     document.addEventListener('keydown', (e) => {
       const drawer = $('[data-drawer]');
@@ -612,6 +651,7 @@
     });
   }
 
-  renderAll();
+  renderAll(false);
+  setupTilt();
   setupEvents();
 })();
