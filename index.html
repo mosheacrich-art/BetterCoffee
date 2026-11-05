@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Better Coffee · Functional cold latte in a can</title>
   <meta name="description" content="Real cold brew, oat milk and 0g sugar, with a functional blend in every can. Focus, Calm and Energy. Join the waitlist for 15% off subscriptions.">
-  <meta name="theme-color" content="#1E2B4F">
+  <meta name="theme-color" content="#141414">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Better Coffee · Functional cold latte in a can">
   <meta property="og:description" content="Real cold brew, oat milk and 0g sugar. Focus, Calm and Energy. Join the waitlist for 15% off subscriptions.">
@@ -13,16 +13,17 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <link rel="preload" href="/assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/img/can-focus.webp" as="image">
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
-<body data-hero="focus">
+<body>
 
   <a class="announce" href="#reserve">
-    <span data-i18n="announce">Launching soon · 15% off subscriptions for waitlist members</span>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <span class="announce-run" data-announce></span>
   </a>
 
   <header class="nav-wrap">
@@ -34,7 +35,6 @@
       </div>
       <a href="#top" class="nav-logo">Better Coffee</a>
       <div class="nav-actions">
-        <a href="#reserve" class="btn btn-ink btn-sm nav-cta" data-i18n="navJoin">Join the waitlist</a>
         <button type="button" class="nav-icon" data-open-account aria-label="Your account" data-i18n-aria="accountTitle">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3.2"/><path d="M6.2 18.4a7 7 0 0 1 11.6 0"/></svg>
         </button>
@@ -45,165 +45,146 @@
   <main id="top">
 
     <!-- HERO -->
-    <section class="hero" aria-label="Better Coffee">
-      <div class="hero-stage">
-        <div class="hero-grain" aria-hidden="true"></div>
-        <div class="hero-copy">
-          <p class="eyebrow" data-i18n="heroEyebrow">Functional cold latte · Launching soon</p>
-          <h1 class="hero-title" data-i18n="heroTitle">Cold coffee that does more.</h1>
+    <section class="hero">
+      <h1 class="sr-only" data-i18n="heroTitle">Cold coffee that does more.</h1>
+      <div class="hero-type" aria-hidden="true">
+        <span class="hero-w hero-w1">Better</span>
+        <span class="hero-w hero-w2">Coffee</span>
+      </div>
+      <div class="hero-cans">
+        <img class="hc hc-calm" src="/assets/img/can-calm.webp" width="462" height="1104" alt="Better Coffee Calm can">
+        <img class="hc hc-focus" src="/assets/img/can-focus.webp" width="462" height="1104" alt="Better Coffee Focus can">
+        <img class="hc hc-energy" src="/assets/img/can-energy.webp" width="462" height="1104" alt="Better Coffee Energy can">
+        <a href="#reserve" class="badge-spin" aria-label="Join the waitlist" data-i18n-aria="joinCta">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs><path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+            <circle cx="100" cy="100" r="98" class="badge-bg"/>
+            <text class="badge-text"><textPath href="#circ" data-badge textLength="462" lengthAdjust="spacing">15% OFF · JOIN THE WAITLIST · </textPath></text>
+          </svg>
+          <span class="badge-core" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+          </span>
+        </a>
+      </div>
+      <div class="hero-foot">
+        <div class="hero-pitch">
+          <p class="mono-label" data-i18n="heroEyebrow">Functional cold latte · Launching soon</p>
+          <p class="hero-lead" data-i18n="heroTitle">Cold coffee that does more.</p>
           <p class="hero-sub" data-i18n="heroSub">Real cold brew, oat milk and 0g sugar, with a functional blend in every can. Pick your moment: Focus, Calm or Energy.</p>
-          <div class="hero-ctas">
-            <a href="#reserve" class="btn btn-ink btn-lg">
-              <span data-i18n="joinCta">Join the waitlist</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-            <a href="#lineup" class="btn btn-ghost btn-lg" data-i18n="heroSecondary">Find your can</a>
-          </div>
-          <p class="hero-perk"><span class="perk-dot" aria-hidden="true"></span><span data-i18n="heroPerk">Waitlist members get 15% off subscriptions</span></p>
-          <ul class="hero-proof">
-            <li><strong>0g</strong><span data-i18n="proofSugar">sugar</span></li>
-            <li><strong>100mg</strong><span data-i18n="proofTheanine">L-theanine</span></li>
-            <li><strong>100%</strong><span data-i18n="proofArabica">Arabica cold brew</span></li>
-            <li><strong>0</strong><span data-i18n="proofDairy">dairy · oat milk</span></li>
-          </ul>
         </div>
-
-        <div class="hero-visual">
-          <div class="hero-word" aria-hidden="true"><span data-hero-word>Focus</span></div>
-          <div class="hero-cans">
-            <img class="hero-can" data-can="focus" src="/assets/img/can-focus.webp" width="462" height="1104" alt="Better Coffee Focus can">
-            <img class="hero-can" data-can="calm" src="/assets/img/can-calm.webp" width="462" height="1104" alt="Better Coffee Calm can" loading="lazy">
-            <img class="hero-can" data-can="energy" src="/assets/img/can-energy.webp" width="462" height="1104" alt="Better Coffee Energy can" loading="lazy">
-          </div>
-          <div class="hero-card">
-            <p class="hero-card-tag" data-hero-tag>Smooth energy. Clear focus. No crash.</p>
-            <p class="hero-card-meta" data-hero-meta>100mg caffeine · 100mg L-theanine</p>
-          </div>
-          <div class="hero-tabs" role="tablist" aria-label="Flavors">
-            <button type="button" role="tab" class="hero-tab" data-pick="focus"><span>Focus</span><i></i></button>
-            <button type="button" role="tab" class="hero-tab" data-pick="calm"><span>Calm</span><i></i></button>
-            <button type="button" role="tab" class="hero-tab" data-pick="energy"><span>Energy</span><i></i></button>
-          </div>
+        <div class="hero-act">
+          <a href="#reserve" class="btn btn-ink btn-lg"><span data-i18n="joinCta">Join the waitlist</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a href="#lineup" class="btn btn-line btn-lg" data-i18n="heroSecondary">Find your can</a>
         </div>
+        <dl class="hero-spec">
+          <div><dt data-i18n="specSugar">Sugar</dt><dd>0g</dd></div>
+          <div><dt data-i18n="specTheanine">L-theanine</dt><dd>100mg</dd></div>
+          <div><dt data-i18n="specCan">Can</dt><dd>200ml</dd></div>
+          <div><dt data-i18n="specBase">Base</dt><dd data-i18n="specBaseVal">Oat milk</dd></div>
+        </dl>
       </div>
     </section>
 
-    <div class="marquee" aria-hidden="true"><div class="marquee-track" data-marquee></div></div>
+    <div class="ticker" aria-hidden="true"><div class="ticker-track" data-marquee></div></div>
 
-    <!-- LINEUP -->
-    <section id="lineup" class="section">
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow" data-i18n="lineupEyebrow">The lineup</p>
-          <h2 class="h2" data-i18n="lineupH">One can for every part of the day.</h2>
-          <p class="lead" data-i18n="lineupP">Same smooth cold brew base. A different functional blend in each can, so you can pick how you want to feel.</p>
+    <!-- STORY -->
+    <section id="lineup" class="story" data-story>
+      <div class="story-stage" data-stage>
+        <div class="story-inner">
+          <div class="story-copy">
+            <p class="mono-label"><span data-story-count>01 / 03</span> · <span data-story-when>Morning</span></p>
+            <h2 class="story-name" data-story-name>Focus</h2>
+            <p class="story-tag" data-story-tag></p>
+            <p class="story-for" data-story-for></p>
+            <a href="#reserve" class="btn btn-stage" data-story-cta data-reserve-flavor="focus">Reserve Focus</a>
+          </div>
+          <div class="story-can">
+            <img data-story-can="focus" src="/assets/img/can-focus.webp" width="462" height="1104" alt="" loading="lazy">
+            <img data-story-can="calm" src="/assets/img/can-calm.webp" width="462" height="1104" alt="" loading="lazy">
+            <img data-story-can="energy" src="/assets/img/can-energy.webp" width="462" height="1104" alt="" loading="lazy">
+          </div>
+          <div class="facts" data-story-facts></div>
         </div>
-        <div class="lineup" data-lineup></div>
+        <div class="story-nav" data-story-nav></div>
       </div>
+      <div class="story-mobile" data-story-mobile></div>
     </section>
 
-    <!-- WHY -->
-    <section class="why">
-      <div class="container">
-        <h2 class="why-title reveal" data-i18n="tagline">You’re already 10/10, this is just your fuel.</h2>
-        <div class="why-grid" data-why></div>
+    <!-- TAGLINE -->
+    <section class="statement">
+      <p class="statement-text" data-statement></p>
+    </section>
+
+    <!-- FORMULA -->
+    <section id="ingredients" class="section">
+      <div class="wrap">
+        <div class="head">
+          <p class="mono-label" data-i18n="inside">What’s inside</p>
+          <h2 class="h2" data-i18n="insideH">Coffee, plus a little help.</h2>
+          <p class="lead" data-i18n="insideP">Every can starts with cold brew, oat milk and 100mg of L-theanine. Each flavor adds its own functional stack.</p>
+        </div>
+        <div class="matrix" role="table" data-matrix></div>
+        <p class="fine" data-i18n="insideNote">Enjoy as part of a varied, balanced diet and a healthy lifestyle.</p>
       </div>
     </section>
 
     <!-- COMPARE -->
-    <section id="compare" class="section">
-      <div class="container container-md">
-        <div class="section-head reveal">
-          <p class="eyebrow" data-i18n="compareEyebrow">Better Coffee vs. the usual</p>
+    <section id="compare" class="section section-soft">
+      <div class="wrap">
+        <div class="head">
+          <p class="mono-label" data-i18n="compareEyebrow">Better Coffee vs. the usual</p>
           <h2 class="h2" data-i18n="compareH">Real function. Real coffee flavor.</h2>
         </div>
-        <div class="compare reveal" data-compare></div>
-      </div>
-    </section>
-
-    <!-- INGREDIENTS -->
-    <section id="ingredients" class="section section-tint">
-      <div class="container">
-        <div class="section-head section-head-row reveal">
-          <div>
-            <p class="eyebrow" data-i18n="inside">What’s inside</p>
-            <h2 class="h2" data-i18n="insideH">Coffee, plus a little help.</h2>
-            <p class="lead" data-i18n="insideP">Every can starts with cold brew, oat milk and 100mg of L-theanine. Each flavor adds its own functional stack.</p>
-          </div>
-          <div class="chips" role="tablist" aria-label="Filter by can" data-ing-filters></div>
-        </div>
-        <div class="ing-grid" data-ingredients></div>
-        <p class="fine" data-i18n="insideNote">Enjoy as part of a varied, balanced diet and a healthy lifestyle.</p>
+        <div class="versus" data-versus></div>
       </div>
     </section>
 
     <!-- RESERVE -->
     <section id="reserve" class="section">
-      <div class="container">
-        <div class="reserve">
-          <div class="reserve-visual">
-            <div class="reserve-panel" data-reserve-panel>
-              <div class="reserve-panel-top">
-                <span class="reserve-name" data-reserve-name>Focus</span>
-                <span class="reserve-effect" data-reserve-effect></span>
-              </div>
-              <img class="reserve-can" data-reserve-can src="/assets/img/can-focus.webp" width="462" height="1104" alt="" loading="lazy">
-            </div>
+      <div class="wrap">
+        <div class="head">
+          <p class="mono-label" data-i18n="howToBuy">Reserve your box · Launching soon</p>
+          <h2 class="h2" data-i18n="lockIn">Lock in launch pricing.</h2>
+          <p class="lead" data-i18n="buyIntro">Cold latte with oat milk, 200 ml, 0g sugar. Join the waitlist and we’ll email you the day orders open.</p>
+        </div>
+        <div class="order">
+          <div class="order-build">
+            <p class="step-label"><span>A</span><span data-i18n="flavor">Choose your flavor</span></p>
+            <div class="tiles" data-flavor-opts></div>
+            <p class="step-label"><span>B</span><span data-i18n="option">Choose your box</span></p>
+            <div class="plans" data-plans></div>
           </div>
-
-          <div class="reserve-form">
-            <p class="eyebrow" data-i18n="howToBuy">Reserve your box · Launching soon</p>
-            <h2 class="h2" data-i18n="lockIn">Lock in launch pricing.</h2>
-            <p class="lead" data-i18n="buyIntro">Cold latte with oat milk, 200 ml, 0g sugar. Join the waitlist and we’ll email you the day orders open.</p>
-
-            <div class="step">
-              <div class="step-label"><span class="step-n">1</span><span data-i18n="flavor">Choose your flavor</span></div>
-              <div class="flavor-pick" data-flavor-opts></div>
-              <p class="step-meta" data-flavor-meta></p>
-            </div>
-
-            <div class="step">
-              <div class="step-label"><span class="step-n">2</span><span data-i18n="option">Choose your box</span></div>
-              <div class="plans" data-plans></div>
-            </div>
-
-            <div class="step">
-              <div class="step-label"><span class="step-n">3</span><span data-i18n="stepEmail">Save your spot</span></div>
+          <aside class="receipt" aria-label="Order preview" data-i18n-aria="receiptTitle">
+            <div class="receipt-paper">
+              <p class="receipt-brand">Better Coffee</p>
+              <p class="receipt-sub" data-i18n="receiptTitle">Order preview</p>
+              <div class="receipt-lines" data-receipt></div>
               <form class="join" data-join="reserve" novalidate>
-                <label class="sr-only" for="reserve-email" data-i18n="emailLabel">Email address</label>
+                <label class="mono-label" for="reserve-email" data-i18n="emailLabel">Email address</label>
                 <input id="reserve-email" type="email" autocomplete="email" required placeholder="you@email.com" data-i18n-ph="emailPh">
-                <button type="submit" class="btn btn-ink btn-lg" data-i18n="joinCta">Join the waitlist</button>
+                <button type="submit" class="btn btn-ink btn-lg btn-block" data-i18n="joinCta">Join the waitlist</button>
+                <p class="receipt-note" data-i18n="assure1">No payment now</p>
               </form>
-              <p class="form-note" data-reserving></p>
               <div class="success" data-success hidden>
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                <div>
-                  <p class="success-title" data-i18n="onList">You’re on the list.</p>
-                  <p class="success-text" data-confirm></p>
-                </div>
+                <p class="success-title" data-i18n="onList">You’re on the list.</p>
+                <p class="success-text" data-confirm></p>
               </div>
             </div>
-
-            <ul class="assure">
-              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span data-i18n="assure1">No payment now</span></li>
-              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg><span data-i18n="assure2">15% off subscriptions</span></li>
-              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span data-i18n="assure3">Skip or cancel anytime</span></li>
-            </ul>
-          </div>
+          </aside>
         </div>
       </div>
     </section>
 
     <!-- ABOUT -->
     <section id="about" class="about">
-      <div class="container">
+      <div class="wrap">
         <div class="about-grid">
-          <div class="reveal">
-            <p class="eyebrow" data-i18n="aboutEyebrow">About us</p>
+          <div>
+            <p class="mono-label" data-i18n="aboutEyebrow">About us</p>
             <h2 class="h2" data-i18n="aboutH">Coffee that keeps up with you.</h2>
           </div>
-          <div class="about-copy reveal">
-            <p data-i18n="aboutP1">Better Coffee started with a simple frustration: canned coffee was either loaded with sugar or tasted like an afterthought. We wanted one we’d actually reach for every day.</p>
+          <div class="about-copy">
+            <p class="about-big" data-i18n="aboutP1">Better Coffee started with a simple frustration: canned coffee was either loaded with sugar or tasted like an afterthought. We wanted one we’d actually reach for every day.</p>
             <p data-i18n="aboutP2">So we built it from the coffee up: 100% Arabica, cold brewed for a smooth, low-acid cup, made with oat milk and 0g sugar. Then we gave each part of the day its own can: Focus, Calm and Energy.</p>
             <p data-i18n="aboutP3">We’re a small team getting ready to launch. Join the waitlist and be among the first to try it.</p>
           </div>
@@ -214,47 +195,35 @@
 
     <!-- FAQ -->
     <section id="faq" class="section">
-      <div class="container">
+      <div class="wrap">
         <div class="faq-grid">
-          <div class="faq-side reveal">
-            <p class="eyebrow" data-i18n="faqEyebrow">FAQ</p>
+          <div class="head">
+            <p class="mono-label" data-i18n="faqEyebrow">FAQ</p>
             <h2 class="h2" data-i18n="faqH">Good questions.</h2>
-            <p class="lead" data-i18n="faqMore">Something else on your mind?</p>
-            <a href="legal-pages/contact.html" class="btn btn-ghost" data-i18n="faqContact">Get in touch</a>
+            <p class="lead"><span data-i18n="faqMore">Something else on your mind?</span> <a href="legal-pages/contact.html" data-i18n="faqContact">Get in touch</a></p>
           </div>
           <div class="faq" data-faq></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FINAL CTA -->
-    <section class="final">
-      <div class="final-inner">
-        <div class="final-cans" aria-hidden="true">
-          <img src="/assets/img/can-calm-sm.webp" width="240" height="573" alt="" loading="lazy">
-          <img src="/assets/img/can-focus-sm.webp" width="240" height="573" alt="" loading="lazy">
-          <img src="/assets/img/can-energy-sm.webp" width="240" height="573" alt="" loading="lazy">
-        </div>
-        <div class="final-copy">
-          <h2 class="final-title" data-i18n="finalH">Be first in line.</h2>
-          <p class="final-sub" data-i18n="finalP">Join the waitlist for early access and 15% off subscriptions when we launch.</p>
-          <form class="join join-light" data-join="final" novalidate>
-            <label class="sr-only" for="final-email" data-i18n="emailLabel">Email address</label>
-            <input id="final-email" type="email" autocomplete="email" required placeholder="you@email.com" data-i18n-ph="emailPh">
-            <button type="submit" class="btn btn-cream btn-lg" data-i18n="joinCta">Join the waitlist</button>
-          </form>
-          <p class="final-done" data-final-done hidden data-i18n="finalDone">You’re on the list. We’ll be in touch.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="container container-wide">
-      <div class="footer-top">
-        <div class="footer-col">
-          <p class="footer-tag" data-i18n="footerTag">Functional cold latte in a can. Focus, Calm, Energy.</p>
+    <div class="wrap">
+      <div class="footer-cta">
+        <h2 class="footer-h" data-i18n="finalH">Be first in line.</h2>
+        <div class="footer-form">
+          <p data-i18n="finalP">Join the waitlist for early access and 15% off subscriptions when we launch.</p>
+          <form class="join join-dark" data-join="final" novalidate>
+            <label class="sr-only" for="final-email" data-i18n="emailLabel">Email address</label>
+            <input id="final-email" type="email" autocomplete="email" required placeholder="you@email.com" data-i18n-ph="emailPh">
+            <button type="submit" class="btn btn-paper btn-lg" data-i18n="joinCta">Join the waitlist</button>
+          </form>
+          <p class="final-done" data-final-done hidden data-i18n="finalDone">You’re on the list. We’ll be in touch.</p>
         </div>
+      </div>
+      <div class="footer-mid">
+        <p data-i18n="footerTag">Functional cold latte in a can. Focus, Calm, Energy.</p>
         <nav class="footer-links" aria-label="Footer">
           <a href="#lineup" data-i18n="navCans">Our cans</a>
           <a href="#ingredients" data-i18n="navIngredients">Ingredients</a>
@@ -263,7 +232,9 @@
           <a href="legal-pages/contact.html" data-i18n="contact">Contact</a>
         </nav>
       </div>
-      <div class="footer-word" aria-hidden="true">Better Coffee</div>
+    </div>
+    <div class="footer-word" aria-hidden="true">Better Coffee</div>
+    <div class="wrap">
       <div class="footer-bottom">
         <span>© 2026 Better Coffee</span>
         <a href="legal-pages/privacy-policy.html" data-i18n="privacy">Privacy Policy</a>
@@ -273,13 +244,10 @@
     </div>
   </footer>
 
-  <div class="sticky-cta" data-sticky-cta>
-    <div class="sticky-cta-text">
-      <strong data-i18n="stickyH">15% off at launch</strong>
-      <span data-i18n="stickyP">For waitlist members</span>
-    </div>
-    <a href="#reserve" class="btn btn-cream btn-sm" data-i18n="stickyBtn">Join</a>
-  </div>
+  <a href="#reserve" class="sticky-cta" data-sticky-cta>
+    <span><strong data-i18n="stickyH">15% off at launch</strong> <span data-i18n="stickyP">For waitlist members</span></span>
+    <span class="sticky-go" data-i18n="stickyBtn">Join</span>
+  </a>
 
   <div class="overlay" data-overlay></div>
   <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" data-drawer>
@@ -290,11 +258,8 @@
       </button>
     </div>
     <div class="drawer-body">
-      <div data-account-joined hidden>
-        <p class="drawer-ok">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E7D46" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-          <span data-i18n="accountOn">You’re on the waitlist</span>
-        </p>
+      <div class="drawer-joined" data-account-joined hidden>
+        <p class="drawer-ok" data-i18n="accountOn">You’re on the waitlist</p>
         <p data-account-as></p>
         <p class="muted" data-i18n="accountPerk">We’ll email you the day orders open, with your 15% off code.</p>
         <button type="button" class="link-btn" data-forget data-i18n="changeEmail">Use a different email</button>
@@ -303,17 +268,17 @@
         <p data-i18n="accountIntro">Join the waitlist for early access and 15% off subscriptions when we launch.</p>
         <label class="sr-only" for="account-email" data-i18n="emailLabel">Email address</label>
         <input id="account-email" type="email" autocomplete="email" required placeholder="you@email.com" data-i18n-ph="emailPh">
-        <button type="submit" class="btn btn-ink btn-lg" data-i18n="joinCta">Join the waitlist</button>
+        <button type="submit" class="btn btn-ink btn-lg btn-block" data-i18n="joinCta">Join the waitlist</button>
       </form>
       <div class="drawer-section">
-        <p class="drawer-label" data-i18n="language">Language</p>
+        <p class="mono-label" data-i18n="language">Language</p>
         <div class="lang-btns">
           <button type="button" class="lang-btn" data-set-lang="en">English</button>
           <button type="button" class="lang-btn" data-set-lang="es">Español</button>
         </div>
       </div>
       <div class="drawer-section">
-        <p class="drawer-label" data-i18n="help">Help</p>
+        <p class="mono-label" data-i18n="help">Help</p>
         <a href="#faq" data-close-drawer data-i18n="navFaq">FAQ</a>
         <a href="legal-pages/contact.html" data-i18n="contact">Contact</a>
       </div>

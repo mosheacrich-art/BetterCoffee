@@ -285,187 +285,224 @@
     renderAccount();
   }
 
+
+  const EXTRA = {
+    en: {
+      specSugar: 'Sugar', specTheanine: 'L-theanine', specCan: 'Can', specBase: 'Base', specBaseVal: 'Oat milk',
+      receiptTitle: 'Order preview',
+      factsTitle: 'Functional facts', factsSub: 'Per can · 200 ml',
+      fCaffeine: 'Caffeine', fTheanine: 'L-theanine', fSugar: 'Sugar', fDairy: 'Dairy', fDairyVal: '0g · oat milk', fStack: 'Functional stack',
+      factsNote: 'High caffeine content. Not recommended for children or pregnant or breast-feeding women.',
+      mxIng: 'Ingredient', mxWhat: 'What it is',
+      usual: 'The usual',
+      rFlavor: 'Flavor', rBox: 'Box', rPrice: 'Price', rPerCan: 'Per can', rPerk: 'Waitlist perk', rPerkVal: '15% off subs', rToday: 'Due today',
+      badge: '15% OFF · JOIN THE WAITLIST · ',
+      count: '{n} / 03',
+    },
+    es: {
+      specSugar: 'Azúcar', specTheanine: 'L-teanina', specCan: 'Lata', specBase: 'Base', specBaseVal: 'Avena',
+      receiptTitle: 'Resumen del pedido',
+      factsTitle: 'Datos funcionales', factsSub: 'Por lata · 200 ml',
+      fCaffeine: 'Cafeína', fTheanine: 'L-teanina', fSugar: 'Azúcar', fDairy: 'Lácteos', fDairyVal: '0 g · avena', fStack: 'Mezcla funcional',
+      factsNote: 'Contenido elevado de cafeína. No recomendado para niños ni mujeres embarazadas o en periodo de lactancia.',
+      mxIng: 'Ingrediente', mxWhat: 'Qué es',
+      usual: 'Lo de siempre',
+      rFlavor: 'Sabor', rBox: 'Caja', rPrice: 'Precio', rPerCan: 'Por lata', rPerk: 'Ventaja lista', rPerkVal: '15% dto. subs', rToday: 'A pagar hoy',
+      badge: '15% DTO · ÚNETE A LA LISTA · ',
+      count: '{n} / 03',
+    },
+  };
+  Object.assign(T.en, EXTRA.en);
+  Object.assign(T.es, EXTRA.es);
+
   /* ---------- Static text ---------- */
   function renderStatic() {
     const t = tx();
     document.documentElement.lang = state.lang;
     $$('[data-i18n]').forEach((el) => {
       const v = t[el.getAttribute('data-i18n')];
-      if (typeof v !== 'string') return;
-      if (v.indexOf('<em>') > -1) el.innerHTML = v; else el.textContent = v;
+      if (typeof v === 'string') el.textContent = v.replace(/<\/?em>/g, '');
     });
     $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t[el.getAttribute('data-i18n-ph')]; });
     $$('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t[el.getAttribute('data-i18n-aria')]); });
-    $$('.hero-can').forEach((img) => { img.alt = fill(t.canAlt, { name: FLAVORS[img.dataset.can].name }); });
+    $$('.hc').forEach((img) => { const k = img.className.match(/hc-(\w+)/)[1]; img.alt = fill(t.canAlt, { name: FLAVORS[k].name }); });
     $$('[data-set-lang]').forEach((b) => b.classList.toggle('is-on', b.dataset.setLang === state.lang));
+    const bp = $('[data-badge]'); bp.textContent = t.badge; bp.setAttribute('textLength', '462'); bp.setAttribute('lengthAdjust', 'spacing');
 
+    const ann = new Array(8).fill('<span>' + esc(t.announce) + '</span><span>✦</span>').join('');
+    $('[data-announce]').innerHTML = ann;
     const run = MARQUEE[state.lang].concat(MARQUEE[state.lang]);
-    $('[data-marquee]').innerHTML = run.map((s) => '<span class="m-item">' + esc(s) + '</span><span class="m-dot"></span>').join('');
+    $('[data-marquee]').innerHTML = run.map((s) => '<span class="t-item">' + esc(s) + '</span><span class="t-sep">//</span>').join('');
 
-    $('[data-why]').innerHTML = t.why.map((w, i) =>
-      '<div class="why-tile reveal"><span class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + WHY_ICONS[i] + '</svg></span><h3>' + esc(w[0]) + '</h3><p>' + esc(w[1]) + '</p></div>'
-    ).join('');
+    const words = t.tagline.replace(/<\/?em>/g, '').split(' ');
+    $('[data-statement]').innerHTML = words.map((w) => {
+      const hl = w.indexOf('10/10') > -1 ? ' hl' : '';
+      const can = /,$/.test(w) ? ' <img class="inline-can" src="' + IMG_SM('energy') + '" alt="" width="240" height="573">' : '';
+      return '<span class="w' + hl + '">' + esc(w) + '</span>' + can;
+    }).join(' ');
 
-    $('[data-stats]').innerHTML = t.stats.map((s) => '<div class="stat reveal"><strong>' + esc(s[0]) + '</strong><span>' + esc(s[1]) + '</span></div>').join('');
-
-    const xIco = '<span class="ico"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>';
-    const okIco = '<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
-    const rows = COMPARE[state.lang];
-    $('[data-compare]').innerHTML =
-      '<div class="c-head c-label"></div><div class="c-head c-them">' + esc(t.typical) + '</div><div class="c-head c-us">Better Coffee</div>' +
-      rows.map((r, i) => '<div class="c-label">' + esc(r[0]) + '</div><div class="c-them">' + xIco + '<span>' + esc(r[1]) + '</span></div><div class="c-us' + (i === rows.length - 1 ? ' is-last' : '') + '">' + okIco + '<span>' + esc(r[2]) + '</span></div>').join('');
+    $('[data-stats]').innerHTML = t.stats.map((s) => '<div class="stat"><strong>' + esc(s[0]) + '</strong><span>' + esc(s[1]) + '</span></div>').join('');
 
     $('[data-faq]').innerHTML = FAQ[state.lang].map((f, i) =>
-      '<details' + (i === 0 ? ' open' : '') + '><summary><span>' + esc(f[0]) + '</span><span class="faq-plus" aria-hidden="true"></span></summary><p class="faq-a">' + esc(f[1]) + '</p></details>'
+      '<details' + (i === 0 ? ' open' : '') + '><summary><span>' + esc(f[0]) + '</span><span class="faq-tog" aria-hidden="true"></span></summary><p class="faq-a">' + esc(f[1]) + '</p></details>'
     ).join('');
+
+    const rows = COMPARE[state.lang];
+    const card = (cls, title, idx) => '<div class="vs-card ' + cls + '"><p class="vs-title">' + esc(title) + '</p><dl>' +
+      rows.map((r) => '<div class="vs-row"><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[idx]) + '</dd></div>').join('') + '</dl></div>';
+    $('[data-versus]').innerHTML = card('them', t.usual, 1) + card('us', 'Better Coffee', 2);
+
+    renderMatrix();
   }
 
-  /* ---------- Hero ---------- */
-  const HERO_MS = 5200;
-  let heroTimer = null;
-  let heroPaused = false;
-
-  function renderHero(animate) {
-    const f = fl(state.hero);
+  /* ---------- Functional facts label ---------- */
+  function factsHTML(k) {
     const t = tx();
-    document.body.dataset.hero = state.hero;
-    $$('.hero-can').forEach((img) => {
-      const on = img.dataset.can === state.hero;
-      if (!on && img.classList.contains('is-active')) {
-        img.classList.add('is-leaving');
-        setTimeout(() => img.classList.remove('is-leaving'), 700);
-      }
-      img.classList.toggle('is-active', on);
-    });
-    $$('.hero-tab').forEach((b) => {
-      const on = b.dataset.pick === state.hero;
-      b.classList.toggle('is-active', on);
-      b.setAttribute('aria-selected', on ? 'true' : 'false');
-      if (on) { const i = b.querySelector('i'); i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }
-    });
-    const word = $('[data-hero-word]');
-    const setWord = () => { word.textContent = f.name; word.classList.remove('is-swap'); };
-    if (animate && !reduceMotion) { word.classList.add('is-swap'); setTimeout(setWord, 250); } else setWord();
-    $('[data-hero-tag]').textContent = f.tag;
-    $('[data-hero-meta]').textContent = mg(f.caffeine, state.lang) + ' ' + t.caffeineShort + ' · ' + t.theanineShort;
+    const f = fl(k);
+    return '<p class="facts-title">' + esc(t.factsTitle) + '</p>' +
+      '<p class="facts-sub">' + esc(f.name) + ' · ' + esc(t.factsSub) + '</p>' +
+      '<div class="facts-row"><b>' + esc(t.fCaffeine) + '</b><b>' + mg(f.caffeine, state.lang) + '</b></div>' +
+      '<div class="facts-row"><b>' + esc(t.fTheanine) + '</b><b>' + mg(100, state.lang) + '</b></div>' +
+      '<div class="facts-row"><span>' + esc(t.fSugar) + '</span><span>' + (state.lang === 'es' ? '0 g' : '0g') + '</span></div>' +
+      '<div class="facts-row thick"><span>' + esc(t.fDairy) + '</span><span>' + esc(t.fDairyVal) + '</span></div>' +
+      '<div class="facts-bot"><b>' + esc(t.fStack) + '</b>' + esc(f.ingredients.join(', ')) + '</div>' +
+      '<p class="facts-note">' + esc(t.factsNote) + '</p>';
   }
 
-  function heroSchedule() {
-    clearTimeout(heroTimer);
-    if (reduceMotion || heroPaused) return;
-    heroTimer = setTimeout(() => {
-      if (document.hidden) return heroSchedule();
-      state.hero = ORDER[(ORDER.indexOf(state.hero) + 1) % ORDER.length];
-      renderHero(true);
-      heroSchedule();
-    }, HERO_MS);
-  }
-
-  function setupHero() {
-    document.documentElement.style.setProperty('--hero-ms', HERO_MS + 'ms');
-    $$('.hero-tab').forEach((b) => b.addEventListener('click', () => {
-      state.hero = b.dataset.pick;
-      renderHero(true);
-      heroSchedule();
-    }));
-    const hero = $('.hero');
-    const pause = (p) => { heroPaused = p; hero.classList.toggle('is-paused', p); if (p) clearTimeout(heroTimer); else heroSchedule(); };
-    const visual = $('.hero-visual');
-    visual.addEventListener('mouseenter', () => pause(true));
-    visual.addEventListener('mouseleave', () => pause(false));
-    if (reduceMotion) hero.classList.add('is-paused');
-    renderHero(false);
-    heroSchedule();
-  }
-
-  /* ---------- Lineup ---------- */
-  function renderLineup() {
+  /* ---------- Story ---------- */
+  let storyIdx = -1;
+  function renderStory(idx, animate) {
     const t = tx();
-    $('[data-lineup]').innerHTML = ORDER.map((k) => {
+    const k = ORDER[idx];
+    const f = fl(k);
+    const story = $('[data-story]');
+    story.style.setProperty('--s-bg', f.bg);
+    story.style.setProperty('--s-ink', f.ink);
+    $('[data-story-count]').textContent = fill(t.count, { n: String(idx + 1).padStart(2, '0') });
+    $('[data-story-when]').textContent = f.when;
+    $('[data-story-name]').textContent = f.name;
+    $('[data-story-tag]').textContent = f.tag;
+    $('[data-story-for]').textContent = f.for;
+    const cta = $('[data-story-cta]');
+    cta.textContent = t.reserve + ' ' + f.name;
+    cta.dataset.reserveFlavor = k;
+    $('[data-story-facts]').innerHTML = factsHTML(k);
+    $$('[data-story-can]').forEach((img) => img.classList.toggle('is-on', img.dataset.storyCan === k));
+    $$('[data-story-nav] button').forEach((b, i) => b.classList.toggle('is-on', i === idx));
+    if (animate && !reduceMotion) {
+      const copy = $('.story-copy');
+      copy.classList.remove('story-swap'); void copy.offsetWidth; copy.classList.add('story-swap');
+    }
+  }
+  function renderStoryChrome() {
+    $('[data-story-nav]').innerHTML = ORDER.map((k, i) =>
+      '<button type="button" data-story-go="' + i + '"><span>' + String(i + 1).padStart(2, '0') + ' ' + esc(FLAVORS[k].name) + '</span><span>' + mg(FLAVORS[k].caffeine, state.lang) + '</span></button>'
+    ).join('');
+    const t = tx();
+    $('[data-story-mobile]').innerHTML = ORDER.map((k, i) => {
       const f = fl(k);
-      return '<article class="card reveal" data-key="' + k + '" style="--c-bg:' + f.bg + ';--c-ink:' + f.ink + ';--c-hero:' + f.hero + '">' +
-        '<div class="card-visual"><span class="card-when">' + esc(f.when) + '</span><span class="card-word" aria-hidden="true">' + esc(f.name) + '</span>' +
-        '<img class="card-can" src="' + IMG(k) + '" width="462" height="1104" loading="lazy" alt="' + esc(fill(t.canAlt, { name: f.name })) + '"></div>' +
-        '<div class="card-body">' +
-          '<h3 class="card-name">' + esc(f.name) + '</h3>' +
-          '<p class="card-tag">' + esc(f.tag) + '</p>' +
-          '<p class="card-for">' + esc(f.for) + '</p>' +
-          '<div class="meter"><div class="meter-row"><span>' + esc(t.caffeineLabel) + '</span><span>' + mg(f.caffeine, state.lang) + '</span></div><div class="meter-bar"><i style="--w:' + Math.round(f.caffeine / MAX_CAFFEINE * 100) + '%"></i></div></div>' +
-          '<div class="tags">' + f.ingredients.map((x) => '<span class="tag">' + esc(x) + '</span>').join('') + '</div>' +
-          '<div class="card-foot"><span class="price-from">' + esc(t.from) + '<strong>' + money(FROM_PER_CAN, state.lang) + '</strong>' + esc(t.perCan) + '</span>' +
-          '<a href="#reserve" class="btn btn-ink" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a></div>' +
-        '</div></article>';
+      return '<div class="sm-panel" style="--s-bg:' + f.bg + ';--s-ink:' + f.ink + '">' +
+        '<p class="mono-label">' + fill(t.count, { n: String(i + 1).padStart(2, '0') }) + ' · ' + esc(f.when) + '</p>' +
+        '<h3 class="story-name">' + esc(f.name) + '</h3>' +
+        '<p class="story-tag">' + esc(f.tag) + '</p>' +
+        '<p class="story-for">' + esc(f.for) + '</p>' +
+        '<a href="#reserve" class="btn btn-stage" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a>' +
+        '<div class="facts">' + factsHTML(k) + '</div>' +
+        '<div class="sm-can"><img src="' + IMG(k) + '" alt="' + esc(fill(t.canAlt, { name: f.name })) + '" width="462" height="1104" loading="lazy"></div>' +
+      '</div>';
     }).join('');
+    storyIdx = -1;
+  }
+  function storyProgress() {
+    const story = $('[data-story]');
+    const r = story.getBoundingClientRect();
+    const span = r.height - window.innerHeight;
+    return span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+  }
+  function updateStory() {
+    const p = storyProgress();
+    const idx = Math.min(ORDER.length - 1, Math.floor(p * ORDER.length));
+    if (idx !== storyIdx) { renderStory(idx, storyIdx !== -1); storyIdx = idx; }
+    $$('[data-story-nav] button').forEach((b, i) => {
+      const local = Math.min(1, Math.max(0, p * ORDER.length - i));
+      b.style.setProperty('--p', (local * 100).toFixed(1) + '%');
+    });
+  }
+  function goStory(i) {
+    const story = $('[data-story]');
+    const span = story.offsetHeight - window.innerHeight;
+    const top = story.getBoundingClientRect().top + window.scrollY + span * ((i + 0.15) / ORDER.length);
+    window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
-  /* ---------- Ingredients ---------- */
-  function renderIngredients(animate) {
+  /* ---------- Statement fill ---------- */
+  function updateStatement() {
+    const el = $('[data-statement]');
+    const r = el.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+    const ws = $$('.w', el);
+    const n = Math.round(p * ws.length);
+    ws.forEach((w, i) => w.classList.toggle('on', i < n));
+  }
+
+  /* ---------- Matrix ---------- */
+  function renderMatrix() {
     const t = tx();
-    const filters = ['all'].concat(ORDER);
-    $('[data-ing-filters]').innerHTML = filters.map((k) =>
-      '<button type="button" role="tab" class="chip' + (k === state.ingFilter ? ' is-on' : '') + '" aria-selected="' + (k === state.ingFilter) + '" data-ing="' + k + '">' + esc(k === 'all' ? t.all : FLAVORS[k].name) + '</button>'
-    ).join('');
-    const list = INGREDIENTS.filter((x) => state.ingFilter === 'all' || x.in.indexOf('all') > -1 || x.in.indexOf(state.ingFilter) > -1);
-    $('[data-ingredients]').innerHTML = list.map((x0, i) => {
+    const head = '<div class="mx-row mx-head" role="row"><span role="columnheader">' + esc(t.mxIng) + '</span><span class="mx-d" role="columnheader">' + esc(t.mxWhat) + '</span>' +
+      ORDER.map((k) => '<span class="mx-c" role="columnheader"><span class="mx-flavor" style="--d:' + FLAVORS[k].bg + '"><i></i>' + esc(FLAVORS[k].name) + '</span></span>').join('') + '</div>';
+    const rows = INGREDIENTS.map((x0) => {
       const x = Object.assign({}, x0, x0[state.lang]);
-      const tags = x.in.map((k) => {
-        const c = k === 'all' ? { bg: '#1E2B4F', ink: '#F1EADF', name: t.every } : FLAVORS[k];
-        return '<span class="ing-tag" style="--t-bg:' + c.bg + ';--t-ink:' + c.ink + '">' + esc(c.name) + '</span>';
-      }).join('');
-      return '<div class="ing" style="--i:' + (animate ? i : 0) + ';--ing-bg:' + x.bg + (animate ? '' : ';animation:none') + '">' +
-        '<div class="ing-top"><span class="ing-num">' + String(i + 1).padStart(2, '0') + '</span><div class="ing-tags">' + tags + '</div></div>' +
-        '<div class="ing-photo"><img src="/assets/img/ingredients/' + x.id + '.webp" alt="" loading="lazy"></div>' +
-        (x.dose ? '<span class="ing-dose">' + esc(x.dose) + '</span>' : '') +
-        '<h3>' + esc(x.name) + '</h3><p>' + esc(x.does) + '</p></div>';
+      return '<div class="mx-row" role="row">' +
+        '<div class="mx-name" role="cell"><span class="mx-photo" style="--ing-bg:' + x.bg + '"><img src="' + '/assets/img/ingredients/' + x.id + '.webp" alt="" loading="lazy"></span><div><h3>' + esc(x.name) + '</h3>' + (x.dose ? '<span class="mx-dose">' + esc(x.dose) + '</span>' : '') + '</div></div>' +
+        '<p class="mx-desc" role="cell">' + esc(x.does) + '</p>' +
+        ORDER.map((k) => {
+          const has = x.in.indexOf('all') > -1 || x.in.indexOf(k) > -1;
+          return '<span class="mx-c" role="cell" aria-label="' + esc(FLAVORS[k].name + (has ? ' ✓' : ' –')) + '">' + (has ? '<span class="dot" style="--d:' + FLAVORS[k].bg + '"></span>' : '<span class="dash"></span>') + '</span>';
+        }).join('') +
+      '</div>';
     }).join('');
+    $('[data-matrix]').innerHTML = head + rows;
   }
 
-  /* ---------- Reserve ---------- */
+  /* ---------- Order ---------- */
+  function renderOrder() {
+    const t = tx();
+    const f = fl(state.flavor);
+    const p = plan(PLANS.find((x) => x.id === state.plan));
+    $('[data-flavor-opts]').innerHTML = ORDER.map((k) => {
+      const on = k === state.flavor;
+      return '<button type="button" class="tile' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-flavor="' + k + '" style="--t-bg:' + FLAVORS[k].bg + ';--t-ink:' + FLAVORS[k].ink + '">' +
+        '<span class="tile-name">' + esc(FLAVORS[k].name) + '</span><span class="tile-mg">' + mg(FLAVORS[k].caffeine, state.lang) + ' ' + esc(t.caffeineShort) + '</span>' +
+        '<img src="' + IMG_SM(k) + '" alt="" width="240" height="573">' +
+        '<span class="tile-check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></button>';
+    }).join('');
+    $('[data-plans]').innerHTML = PLANS.map((p0) => {
+      const x = plan(p0);
+      const on = x.id === state.plan;
+      return '<button type="button" class="plan' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-plan="' + x.id + '"><span class="box" aria-hidden="true"></span>' +
+        '<span class="plan-main"><span class="plan-name">' + esc(x.name) + (x.badge ? '<span class="tagb">' + esc(x.badge) + '</span>' : '') + '</span><span class="plan-note">' + esc(x.note) + '</span></span>' +
+        '<span class="plan-price">' + (x.compare ? '<s>' + money(x.compare, state.lang) + '</s>' : '') + '<strong>' + money(x.price, state.lang) + '</strong><small>' + (x.monthly ? esc(t.perMonth) + ' · ' : '') + money(x.price / x.cans, state.lang) + ' ' + esc(t.perCan) + '</small></span></button>';
+    }).join('');
+
+    const line = (a, b, cls) => '<div class="r-line' + (cls ? ' ' + cls : '') + '"><span>' + esc(a) + '</span><i></i><span>' + esc(b) + '</span></div>';
+    $('[data-receipt]').innerHTML =
+      line(t.rFlavor, f.name) +
+      line(t.rBox, p.name) +
+      line(t.rPrice, money(p.price, state.lang) + (p.monthly ? t.perMonth : '')) +
+      line(t.rPerCan, money(p.price / p.cans, state.lang)) +
+      line(t.rPerk, t.rPerkVal, 'r-perk') +
+      line(t.rToday, money(0, state.lang), 'r-total');
+
+    $('[data-join="reserve"]').hidden = state.reserved;
+    $('[data-success]').hidden = !state.reserved;
+    if (state.reserved) $('[data-confirm]').textContent = fill(t.confirm, { email: state.reservedEmail, summary: summary() });
+  }
   function summary() {
     const t = tx();
     const f = fl(state.flavor);
     const p = plan(PLANS.find((x) => x.id === state.plan));
-    const price = money(p.price, state.lang) + (p.monthly ? t.perMonth : '');
-    return fill(t.summary, { flavor: f.name, plan: p.name.toLowerCase(), price });
-  }
-
-  function renderReserve(swap) {
-    const t = tx();
-    const f = fl(state.flavor);
-    const panel = $('[data-reserve-panel]');
-    panel.style.setProperty('--p-bg', f.bg);
-    panel.style.setProperty('--p-ink', f.ink);
-    $('[data-reserve-name]').textContent = f.name;
-    $('[data-reserve-effect]').textContent = f.effect;
-    const can = $('[data-reserve-can]');
-    can.alt = fill(t.canAlt, { name: f.name });
-    if (swap && !reduceMotion) {
-      can.classList.add('is-swap');
-      setTimeout(() => { can.src = IMG(state.flavor); can.classList.remove('is-swap'); }, 220);
-    } else can.src = IMG(state.flavor);
-
-    $('[data-flavor-opts]').innerHTML = ORDER.map((k) =>
-      '<button type="button" class="fpick' + (k === state.flavor ? ' is-on' : '') + '" aria-pressed="' + (k === state.flavor) + '" data-flavor="' + k + '" style="--s-bg:' + FLAVORS[k].hero + '"><span class="fpick-swatch"><img src="' + IMG_SM(k) + '" alt="" width="240" height="573"></span>' + esc(FLAVORS[k].name) + '</button>'
-    ).join('');
-    $('[data-flavor-meta]').textContent = f.ingredients.join(', ') + ' · ' + mg(f.caffeine, state.lang) + ' ' + t.caffeineShort;
-
-    $('[data-plans]').innerHTML = PLANS.map((p0) => {
-      const p = plan(p0);
-      const on = p.id === state.plan;
-      return '<button type="button" class="plan' + (on ? ' is-on' : '') + '" aria-pressed="' + on + '" data-plan="' + p.id + '">' +
-        '<span class="radio" aria-hidden="true"></span>' +
-        '<span class="plan-main"><span class="plan-name">' + esc(p.name) + (p.badge ? '<span class="badge">' + esc(p.badge) + '</span>' : '') + '</span><span class="plan-note">' + esc(p.note) + '</span></span>' +
-        '<span class="plan-price">' + (p.compare ? '<s>' + money(p.compare, state.lang) + '</s>' : '') + '<strong>' + money(p.price, state.lang) + (p.monthly ? '<small style="font-family:var(--sans);font-size:13px">' + esc(t.perMonth) + '</small>' : '') + '</strong><span>' + money(p.price / p.cans, state.lang) + ' ' + esc(t.perCan) + '</span></span>' +
-      '</button>';
-    }).join('');
-
-    const s = summary();
-    $('[data-reserving]').textContent = fill(t.reserving, { summary: s });
-    const form = $('[data-join="reserve"]');
-    form.hidden = state.reserved;
-    $('[data-reserving]').hidden = state.reserved;
-    $('[data-success]').hidden = !state.reserved;
-    if (state.reserved) $('[data-confirm]').textContent = fill(t.confirm, { email: state.reservedEmail, summary: s });
+    return fill(t.summary, { flavor: f.name, plan: p.name.toLowerCase(), price: money(p.price, state.lang) + (p.monthly ? t.perMonth : '') });
   }
 
   /* ---------- Account drawer ---------- */
@@ -482,7 +519,7 @@
     $('[data-drawer]').classList.add('is-open');
     document.body.style.overflow = 'hidden';
     const input = $('#account-email');
-    if (input && !state.joinedEmail) input.value = input.value || $('#reserve-email').value;
+    if (input && !state.joinedEmail && !input.value) input.value = $('#reserve-email').value;
     setTimeout(() => { const c = $('[data-drawer] .drawer-close'); if (c) c.focus(); }, 50);
   }
   function closeDrawer() {
@@ -492,7 +529,6 @@
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
-  /* ---------- Forms ---------- */
   function handleJoin(form) {
     const input = form.querySelector('input[type="email"]');
     const email = (input.value || '').trim();
@@ -500,84 +536,46 @@
     input.classList.toggle('is-invalid', !ok);
     if (!ok) { input.focus(); return; }
     subscribe(email);
-    const kind = form.dataset.join;
-    if (kind === 'reserve') { state.reserved = true; state.reservedEmail = email; renderReserve(false); }
-    if (kind === 'final') { form.hidden = true; $('[data-final-done]').hidden = false; }
+    if (form.dataset.join === 'reserve') { state.reserved = true; state.reservedEmail = email; renderOrder(); }
+    if (form.dataset.join === 'final') { form.hidden = true; $('[data-final-done]').hidden = false; }
   }
 
-  /* ---------- Language ---------- */
+  function renderAll() {
+    renderStatic();
+    renderStoryChrome();
+    renderOrder();
+    renderAccount();
+    onScroll();
+  }
   function setLang(lang) {
     state.lang = lang;
     store.set('bc-lang', lang);
-    renderAll(false);
-    observeReveals(true);
+    renderAll();
   }
 
-  function renderAll(animate) {
-    renderStatic();
-    renderHero(false);
-    renderLineup();
-    renderIngredients(animate);
-    renderReserve(false);
-    renderAccount();
+  /* ---------- Scroll ---------- */
+  let ticking = false;
+  function onScroll() {
+    ticking = false;
+    $('.nav').classList.toggle('is-scrolled', window.scrollY > 40);
+    if (window.innerWidth >= 900) updateStory();
+    if (reduceMotion) $$('[data-statement] .w').forEach((w) => w.classList.add('on')); else updateStatement();
+    const vh = window.innerHeight;
+    const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < vh && r.bottom > 0; };
+    const pastHero = $('.hero').getBoundingClientRect().bottom < 0;
+    $('[data-sticky-cta]').classList.toggle('is-on', pastHero && !inView($('#reserve')) && !inView($('.footer')));
   }
 
-  /* ---------- Scroll effects ---------- */
-  let io = null;
-  function observeReveals(instant) {
-    const els = $$('.reveal:not(.is-in)');
-    if (!('IntersectionObserver' in window) || reduceMotion) { els.forEach((e) => e.classList.add('is-in')); return; }
-    if (!io) {
-      io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (!en.isIntersecting) return;
-          const el = en.target;
-          const sibs = el.parentElement ? Array.from(el.parentElement.children).filter((c) => c.classList.contains('reveal')) : [];
-          const idx = Math.max(0, sibs.indexOf(el));
-          el.style.transitionDelay = Math.min(idx, 4) * 90 + 'ms';
-          el.classList.add('is-in');
-          io.unobserve(el);
-        });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
-    }
-    els.forEach((e) => {
-      if (instant) {
-        const r = e.getBoundingClientRect();
-        if (r.top < window.innerHeight) { e.classList.add('is-in'); return; }
-      }
-      io.observe(e);
-    });
-  }
-
-  function setupScroll() {
-    const nav = $('.nav');
-    const sticky = $('[data-sticky-cta]');
-    const hero = $('.hero');
-    const reserve = $('#reserve');
-    const final = $('.final');
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const y = window.scrollY;
-      nav.classList.toggle('is-scrolled', y > 40);
-      const pastHero = hero.getBoundingClientRect().bottom < 0;
-      const vh = window.innerHeight;
-      const inView = (el) => { const r = el.getBoundingClientRect(); return r.top < vh && r.bottom > 0; };
-      sticky.classList.toggle('is-on', pastHero && !inView(reserve) && !inView(final));
-    };
-    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-    update();
-  }
-
-  /* ---------- Events ---------- */
   function setupEvents() {
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    window.addEventListener('resize', () => requestAnimationFrame(onScroll));
     document.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-reserve-flavor],[data-flavor],[data-plan],[data-ing],[data-open-account],[data-close-drawer],[data-set-lang],[data-toggle-lang],[data-forget],[data-overlay]');
+      const el = e.target.closest('[data-reserve-flavor],[data-flavor],[data-plan],[data-story-go],[data-open-account],[data-close-drawer],[data-set-lang],[data-toggle-lang],[data-forget],[data-overlay]');
       if (!el) return;
-      if (el.matches('[data-reserve-flavor]')) { state.flavor = el.dataset.reserveFlavor; renderReserve(true); return; }
-      if (el.matches('[data-flavor]')) { if (state.flavor !== el.dataset.flavor) { state.flavor = el.dataset.flavor; renderReserve(true); } return; }
-      if (el.matches('[data-plan]')) { state.plan = el.dataset.plan; renderReserve(false); return; }
-      if (el.matches('[data-ing]')) { state.ingFilter = el.dataset.ing; renderIngredients(true); return; }
+      if (el.matches('[data-reserve-flavor]')) { state.flavor = el.dataset.reserveFlavor; renderOrder(); return; }
+      if (el.matches('[data-flavor]')) { state.flavor = el.dataset.flavor; renderOrder(); return; }
+      if (el.matches('[data-plan]')) { state.plan = el.dataset.plan; renderOrder(); return; }
+      if (el.matches('[data-story-go]')) { goStory(+el.dataset.storyGo); return; }
       if (el.matches('[data-open-account]')) { openDrawer(); return; }
       if (el.matches('[data-close-drawer]') || el.matches('[data-overlay]')) { closeDrawer(); return; }
       if (el.matches('[data-set-lang]')) { setLang(el.dataset.setLang); return; }
@@ -587,7 +585,7 @@
         state.joinedEmail = '';
         state.reserved = false;
         renderAccount();
-        renderReserve(false);
+        renderOrder();
         const i = $('#account-email'); if (i) { i.value = ''; i.focus(); }
       }
     });
@@ -614,9 +612,6 @@
     });
   }
 
-  renderAll(false);
-  setupHero();
+  renderAll();
   setupEvents();
-  setupScroll();
-  observeReveals(false);
 })();
