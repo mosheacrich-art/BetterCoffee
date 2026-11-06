@@ -489,7 +489,7 @@
     '<div class="floor"></div>' +
     '<div class="pack-float"><div class="pack-settle"><div class="pack">' +
       '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div><div class="fill"></div>' +
-      '<div class="lids"></div><div class="peeks peeks-right"></div><div class="peeks peeks-front"></div>' +
+      '<div class="lids"></div>' +
       '<div class="face f-right"><div class="pk-side"><p class="pk-side-title" data-pk-side></p><ul class="pk-stack" data-pk-stack></ul><p class="pk-side-foot"><span>200 ml</span><span data-pk-sidemg></span></p></div></div>' +
       '<div class="face f-front"><div class="pk-front"><p class="pk-brand">better coffee<span>.</span></p><p class="pk-count">12 × 200 ml</p>' +
         '<p class="pk-name" data-pk-name></p><p class="pk-line" data-pk-line></p><p class="pk-mg" data-pk-mg></p></div>' +
@@ -502,16 +502,13 @@
   let packShown = false;
   function packStep() { return 70; }
   function dropCans(scene, k, animate) {
-    const lids = $('.lids', scene), front = $('.peeks-front', scene), right = $('.peeks-right', scene);
+    const lids = $('.lids', scene);
     const step = packStep();
     const build = () => {
       const d = (r, c) => (animate ? (r * 4 + c) * step : 0) + 'ms';
       let l = '';
       for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) l += '<i class="lid" style="--d:' + d(r, c) + '"></i>';
       lids.innerHTML = l;
-      const bg = 'background-image:url(' + IMG_SM(k) + ')';
-      front.innerHTML = [0, 1, 2, 3].map((c) => '<i class="peek" style="--d:' + d(2, c) + ';' + bg + '"></i>').join('');
-      right.innerHTML = [2, 1, 0].map((r) => '<i class="peek" style="--d:' + d(r, 3) + ';' + bg + '"></i>').join('');
       scene.classList.toggle('no-anim', !animate);
       clearTimeout(scene._fullT);
       if (animate) { scene.classList.remove('full'); scene._fullT = setTimeout(() => scene.classList.add('full'), 11 * step + 650); } else scene.classList.add('full');
