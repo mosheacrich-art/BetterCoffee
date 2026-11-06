@@ -488,7 +488,7 @@
   const PACK_SHELL = '<div class="scene" data-mode="pack"><div class="scene-in">' +
     '<div class="floor"></div>' +
     '<div class="pack-float"><div class="pack-settle"><div class="pack">' +
-      '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div><div class="bed"></div><div class="beans"></div>' +
+      '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div><div class="fill"></div>' +
       '<div class="lids"></div>' +
       '<div class="face f-right"><div class="pk-side"><p class="pk-side-title" data-pk-side></p><ul class="pk-stack" data-pk-stack></ul><p class="pk-side-foot"><span>200 ml</span><span data-pk-sidemg></span></p></div></div>' +
       '<div class="face f-front"><div class="pk-front"><p class="pk-brand">better coffee<span>.</span></p><p class="pk-count">12 × 200 ml</p>' +
@@ -501,43 +501,24 @@
   let packMode = null;
   let packShown = false;
   function packStep() { return 70; }
-  const BEANS = 46;
-  const POUR_MS = 1350;
-  function pourBeans(scene, animate) {
-    const beans = $('.beans', scene);
-    let h = '';
-    if (animate) {
-      for (let i = 0; i < BEANS; i++) {
-        const x = 6 + Math.random() * 88;
-        const y = 6 + Math.random() * 88;
-        const f = (i / BEANS).toFixed(3);
-        h += '<i class="bean" style="left:' + x.toFixed(1) + '%;top:' + y.toFixed(1) + '%;--f:' + f +
-          ';--dx:calc(var(--W) * ' + ((50 - x) / 100 * 0.8).toFixed(3) + ');--dy:calc(var(--D) * ' + ((50 - y) / 100 * 0.8).toFixed(3) + ')' +
-          ';--r:' + Math.round(Math.random() * 360) + 'deg;--d:' + Math.round(i * 24 + Math.random() * 40) + 'ms;--s:' + (0.8 + Math.random() * 0.45).toFixed(2) + '"></i>';
-      }
-    }
-    beans.innerHTML = h;
-    scene.dataset.poured = '1';
-    scene.classList.toggle('pouring', animate);
-    if (animate) { clearTimeout(scene._pourT); scene._pourT = setTimeout(() => { scene.classList.remove('pouring'); }, POUR_MS + 1200); }
-  }
   function dropCans(scene, k, animate) {
     const lids = $('.lids', scene);
     const step = packStep();
-    let base = 0;
-    if (!scene.dataset.poured) { pourBeans(scene, animate); if (animate) base = POUR_MS; }
     const build = () => {
-      const d = (r, c) => (animate ? base + (r * 4 + c) * step : 0) + 'ms';
+      const d = (r, c) => (animate ? (r * 4 + c) * step : 0) + 'ms';
       let l = '';
       for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) l += '<i class="lid" style="--d:' + d(r, c) + '"></i>';
       lids.innerHTML = l;
       scene.classList.toggle('no-anim', !animate);
+      clearTimeout(scene._fullT);
+      if (animate) { scene.classList.remove('full'); scene._fullT = setTimeout(() => scene.classList.add('full'), 11 * step + 650); } else scene.classList.add('full');
       const st = $('.pack-settle', scene);
       st.classList.remove('settle');
-      if (animate) { void st.offsetWidth; st.style.setProperty('--sd', (base + 11 * step + 520) + 'ms'); st.classList.add('settle'); }
+      if (animate) { void st.offsetWidth; st.style.setProperty('--sd', (11 * step + 520) + 'ms'); st.classList.add('settle'); }
     };
     if (animate && lids.children.length) {
       scene.classList.add('lift');
+      scene.classList.remove('full');
       setTimeout(() => { scene.classList.remove('lift'); build(); }, 320);
     } else build();
   }
