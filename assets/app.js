@@ -488,8 +488,8 @@
   const PACK_SHELL = '<div class="scene" data-mode="pack"><div class="scene-in">' +
     '<div class="floor"></div>' +
     '<div class="pack-float"><div class="pack-settle"><div class="pack">' +
-      '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div>' +
-      '<div class="cans"></div>' +
+      '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div><div class="fill"></div>' +
+      '<div class="lids"></div>' +
       '<div class="face f-right"><div class="pk-side"><p class="pk-side-title" data-pk-side></p><ul class="pk-stack" data-pk-stack></ul><p class="pk-side-foot"><span>200 ml</span><span data-pk-sidemg></span></p></div></div>' +
       '<div class="face f-front"><div class="pk-front"><p class="pk-brand">better coffee<span>.</span></p><p class="pk-count">12 × 200 ml</p>' +
         '<p class="pk-name" data-pk-name></p><p class="pk-line" data-pk-line></p><p class="pk-mg" data-pk-mg></p></div>' +
@@ -500,75 +500,32 @@
   let packFlavor = null;
   let packMode = null;
   let packShown = false;
-  function packStep() { return 85; }
-  const DROP_MS = 1150;
-  const LIFT_MS = 380;
-  function canY(p) {
-    if (p <= 0.66) { const q = p / 0.66; return -62 * (1 - q * q); }
-    if (p <= 0.80) { const q = (p - 0.66) / 0.14; return -1.9 * (1 - (1 - q) * (1 - q)); }
-    if (p <= 0.91) { const q = (p - 0.80) / 0.11; return -1.9 * (1 - q * q); }
-    if (p <= 0.955) { const q = (p - 0.91) / 0.045; return -0.4 * (1 - (1 - q) * (1 - q)); }
-    if (p < 1) { const q = (p - 0.955) / 0.045; return -0.4 * (1 - q * q); }
-    return 0;
-  }
-  function setCan(el, y, rot, op) {
-    el.style.transform = 'translate3d(var(--x), ' + y.toFixed(2) + 'cqw, var(--z)) rotateZ(' + rot.toFixed(2) + 'deg)';
-    el.style.opacity = op;
-  }
-  function runCans(scene, items, mode, done) {
-    cancelAnimationFrame(scene._raf);
-    const t0 = performance.now();
-    const dur = mode === 'drop' ? DROP_MS : LIFT_MS;
-    const tick = (now) => {
-      let busy = false;
-      items.forEach((it) => {
-        const p = Math.min(1, Math.max(0, (now - t0 - it.delay) / dur));
-        if (p < 1) busy = true;
-        if (mode === 'drop') {
-          const rot = p < 0.66 ? it.tilt * (1 - p / 0.66) : 0;
-          setCan(it.el, canY(p), rot, Math.min(1, p / 0.08));
-        } else {
-          setCan(it.el, -55 * p * p, 0, 1 - p);
-        }
-      });
-      if (busy) { scene._raf = requestAnimationFrame(tick); return; }
-      if (mode === 'drop') items.forEach((it) => { it.el.style.transform = ''; it.el.style.opacity = ''; });
-      if (done) done();
-    };
-    scene._raf = requestAnimationFrame(tick);
-  }
+  function packStep() { return 70; }
   function dropCans(scene, k, animate) {
-    const holder = $('.cans', scene);
+    const lids = $('.lids', scene);
     const step = packStep();
     const build = () => {
+      const d = (r, c) => (animate ? (r * 4 + c) * step : 0) + 'ms';
       let l = '';
-      const cx = (c) => 'calc((var(--W) - 1.4cqw) * ' + ((c + 0.5) / 4 - 0.5).toFixed(4) + ')';
-      const cz = (r) => 'calc((var(--D) - 1.4cqw) * ' + ((r + 0.5) / 3 - 0.5).toFixed(4) + ')';
-      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
-        l += '<div class="can3d" style="--x:' + cx(c) + ';--z:' + cz(r) + '">' +
-          '<i class="can-body" style="background-image:url(' + IMG(k) + ')"></i><i class="lid"></i></div>';
-      }
-      holder.innerHTML = l;
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) l += '<i class="lid" style="--d:' + d(r, c) + '"></i>';
+      lids.innerHTML = l;
+      scene.classList.toggle('no-anim', !animate);
+      clearTimeout(scene._fullT);
+      if (animate) { scene.classList.remove('full'); scene._fullT = setTimeout(() => scene.classList.add('full'), 11 * step + 650); } else scene.classList.add('full');
       const st = $('.pack-settle', scene);
       st.classList.remove('settle');
-      if (!animate) return;
-      const items = $$('.can3d', holder).map((el, i) => ({ el, delay: i * step, tilt: Math.random() * 12 - 6 }));
-      items.forEach((it) => setCan(it.el, -62, it.tilt, 0));
-      runCans(scene, items, 'drop');
-      void st.offsetWidth;
-      st.style.setProperty('--sd', (11 * step + 760) + 'ms');
-      st.classList.add('settle');
+      if (animate) { void st.offsetWidth; st.style.setProperty('--sd', (11 * step + 520) + 'ms'); st.classList.add('settle'); }
     };
-    const old = $$('.can3d', holder);
-    if (animate && old.length) runCans(scene, old.map((el, i) => ({ el, delay: (old.length - 1 - i) * 18 })), 'lift', build);
-    else build();
+    if (animate && lids.children.length) {
+      scene.classList.add('lift');
+      scene.classList.remove('full');
+      setTimeout(() => { scene.classList.remove('lift'); build(); }, 320);
+    } else build();
   }
   function renderPack(f, p, t) {
     const host = $('[data-crate]');
     let scene = $('.scene', host);
-    if (!scene) {
-      host.innerHTML = PACK_SHELL; scene = $('.scene', host); setupPackTilt(scene);
-    }
+    if (!scene) { host.innerHTML = PACK_SHELL; scene = $('.scene', host); setupPackTilt(scene); }
     const mode = p.cans === 1 ? 'single' : 'pack';
     scene.style.setProperty('--c-bg', f.bg);
     scene.style.setProperty('--c-ink', f.ink);
