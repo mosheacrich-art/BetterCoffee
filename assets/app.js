@@ -120,7 +120,7 @@
       announce: 'Launching soon · 15% off subscriptions for waitlist members',
       navCans: 'Our cans', navIngredients: 'Ingredients', navAbout: 'About us', navFaq: 'FAQ', navJoin: 'Join the waitlist',
       heroEyebrow: 'Functional cold latte · Launching soon',
-      heroTitle: 'Cold coffee that does more.',
+      heroTitle: 'Coffee that does more.',
       heroSub: 'Real cold brew, oat milk and 0g sugar, with a functional blend in every can. Pick your moment: Focus, Calm or Energy.',
       heroSecondary: 'Find your can',
       heroPerk: 'Waitlist members get 15% off subscriptions',
@@ -181,7 +181,7 @@
       announce: 'Muy pronto · 15% de descuento en suscripciones para la lista de espera',
       navCans: 'Latas', navIngredients: 'Ingredientes', navAbout: 'Nosotros', navFaq: 'Preguntas', navJoin: 'Únete a la lista',
       heroEyebrow: 'Latte frío funcional · Muy pronto',
-      heroTitle: 'Café frío que hace más.',
+      heroTitle: 'Café que hace más.',
       heroSub: 'Cold brew de verdad, bebida de avena y 0 g de azúcar, con una mezcla funcional en cada lata. Elige tu momento: Focus, Calm o Energy.',
       heroSecondary: 'Encuentra tu lata',
       heroPerk: 'La lista de espera tiene un 15% de descuento en suscripciones',
@@ -349,10 +349,10 @@
         '<p class="panel-for">' + esc(f.for) + '</p>' +
         '<h2 class="panel-name">' + esc(f.name) + '.</h2>' +
         '<img class="panel-can" src="' + IMG(k) + '" width="462" height="1104" alt="' + esc(fill(t.canAlt, { name: f.name })) + '" loading="lazy">' +
-        '<div class="panel-stack"><ul class="stack-list">' + stack.map((s) => '<li>' + esc(s) + '.</li>').join('') + '</ul>' +
+        '<div class="panel-stack"><span class="panel-mg"><b>' + mg(f.caffeine, state.lang) + '</b>' + esc(t.caffeineShort) + '</span>' +
+          '<ul class="stack-list">' + stack.map((s) => '<li>' + esc(s) + '.</li>').join('') + '</ul>' +
           '<p class="panel-tag">' + esc(f.tag) + '</p>' +
-          '<div class="panel-meta"><span class="panel-mg">' + mg(f.caffeine, state.lang) + '<small>' + esc(t.caffeineShort) + '</small></span>' +
-          '<a href="#reserve" class="pill" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a></div>' +
+          '<a href="#reserve" class="pill" data-reserve-flavor="' + k + '">' + esc(t.reserve) + ' ' + esc(f.name) + '</a>' +
         '</div></article>';
     }).join('');
   }
