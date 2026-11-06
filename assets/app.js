@@ -289,12 +289,12 @@
   Object.assign(T.en, {
     joinShort: 'Get 15% off', reserveCta: 'Reserve my box', rToday: 'Due today',
     heroDone: 'You’re on the list. Your 15% off is saved.',
-    stackCoffee: 'coffee', crateCap: '{n} × {flavor}', count: '{n} / 03',
+    packLine: 'cold latte · oat milk · 0g sugar', packSide: 'functional cold latte', packSub: 'every month · 15% off', stackCoffee: 'coffee', crateCap: '{n} × {flavor}', count: '{n} / 03',
   });
   Object.assign(T.es, {
     joinShort: 'Quiero mi 15%', reserveCta: 'Reservar mi caja', rToday: 'A pagar hoy',
     heroDone: 'Ya estás en la lista. Tu 15% está guardado.',
-    stackCoffee: 'café', crateCap: '{n} × {flavor}', count: '{n} / 03',
+    packLine: 'latte frío · bebida de avena · 0 g de azúcar', packSide: 'latte frío funcional', packSub: 'cada mes · 15% dto.', stackCoffee: 'café', crateCap: '{n} × {flavor}', count: '{n} / 03',
   });
   const TONE_OF = { focus: 'cream', calm: 'green', energy: 'violet' };
   state.orbit = 'all';
@@ -464,13 +464,7 @@
     const t = tx();
     const f = fl(state.flavor);
     const p = plan(PLANS.find((x) => x.id === state.plan));
-    if (refill !== false) {
-      let html = '';
-      for (let i = 0; i < 12; i++) {
-        html += i < p.cans ? '<span class="slot"><img src="' + IMG_SM(state.flavor) + '" alt="" width="240" height="573" style="--i:' + i + '"></span>' : '<span class="slot is-empty"></span>';
-      }
-      $('[data-crate]').innerHTML = html;
-    }
+    renderPack(f, p, t);
     $('[data-crate-cap]').innerHTML = '<b>' + esc(fill(t.crateCap, { n: p.cans, flavor: f.name })) + '</b><span>' + money(p.price / p.cans, state.lang) + ' ' + esc(t.perCan) + '</span>';
     $('[data-flavor-opts]').innerHTML = ORDER.map((k) =>
       '<button type="button" class="flav-btn' + (k === state.flavor ? ' is-on' : '') + '" aria-pressed="' + (k === state.flavor) + '" data-flavor="' + k + '" style="--fb:' + FLAVORS[k].bg + '"><i></i>' + esc(FLAVORS[k].name) + '</button>'
@@ -487,6 +481,100 @@
     $('[data-join="reserve"]').hidden = state.reserved;
     $('[data-success]').hidden = !state.reserved;
     if (state.reserved) $('[data-confirm]').textContent = fill(t.confirm, { email: state.reservedEmail, summary: summary() });
+  }
+
+
+  /* ---------- 12-pack carton ---------- */
+  const PACK_SHELL = '<div class="scene" data-mode="pack"><div class="scene-in">' +
+    '<div class="floor"></div>' +
+    '<div class="pack-float"><div class="pack-settle"><div class="pack">' +
+      '<div class="face f-back"></div><div class="face f-left"></div><div class="rim"></div><div class="face f-back-in"></div><div class="face f-left-in"></div><div class="fill"></div>' +
+      '<div class="lids"></div><div class="peeks peeks-right"></div><div class="peeks peeks-front"></div>' +
+      '<div class="face f-right"><div class="pk-side"><p class="pk-side-title" data-pk-side></p><ul class="pk-stack" data-pk-stack></ul><p class="pk-side-foot"><span>200 ml</span><span data-pk-sidemg></span></p></div></div>' +
+      '<div class="face f-front"><div class="pk-front"><p class="pk-brand">better coffee<span>.</span></p><p class="pk-count">12 × 200 ml</p>' +
+        '<p class="pk-name" data-pk-name></p><p class="pk-line" data-pk-line></p><p class="pk-mg" data-pk-mg></p></div>' +
+        '<span class="sticker" data-pk-sticker></span></div>' +
+    '</div></div></div>' +
+    '<div class="single"><img data-pk-single src="" width="240" height="573" alt=""></div>' +
+  '</div></div>';
+  let packFlavor = null;
+  let packMode = null;
+  let packShown = false;
+  function packStep() { return 70; }
+  function dropCans(scene, k, animate) {
+    const lids = $('.lids', scene), front = $('.peeks-front', scene), right = $('.peeks-right', scene);
+    const step = packStep();
+    const build = () => {
+      const d = (r, c) => (animate ? (r * 4 + c) * step : 0) + 'ms';
+      let l = '';
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) l += '<i class="lid" style="--d:' + d(r, c) + '"></i>';
+      lids.innerHTML = l;
+      const bg = 'background-image:url(' + IMG_SM(k) + ')';
+      front.innerHTML = [0, 1, 2, 3].map((c) => '<i class="peek" style="--d:' + d(2, c) + ';' + bg + '"></i>').join('');
+      right.innerHTML = [2, 1, 0].map((r) => '<i class="peek" style="--d:' + d(r, 3) + ';' + bg + '"></i>').join('');
+      scene.classList.toggle('no-anim', !animate);
+      clearTimeout(scene._fullT);
+      if (animate) { scene.classList.remove('full'); scene._fullT = setTimeout(() => scene.classList.add('full'), 11 * step + 650); } else scene.classList.add('full');
+      const st = $('.pack-settle', scene);
+      st.classList.remove('settle');
+      if (animate) { void st.offsetWidth; st.style.setProperty('--sd', (11 * step + 520) + 'ms'); st.classList.add('settle'); }
+    };
+    if (animate && lids.children.length) {
+      scene.classList.add('lift');
+      scene.classList.remove('full');
+      setTimeout(() => { scene.classList.remove('lift'); build(); }, 320);
+    } else build();
+  }
+  function renderPack(f, p, t) {
+    const host = $('[data-crate]');
+    let scene = $('.scene', host);
+    if (!scene) { host.innerHTML = PACK_SHELL; scene = $('.scene', host); setupPackTilt(scene); }
+    const mode = p.cans === 1 ? 'single' : 'pack';
+    scene.style.setProperty('--c-bg', f.bg);
+    scene.style.setProperty('--c-ink', f.ink);
+    scene.dataset.sub = p.monthly ? '1' : '0';
+    $('[data-pk-name]', scene).textContent = f.name + '.';
+    $('[data-pk-line]', scene).textContent = t.packLine;
+    $('[data-pk-mg]', scene).textContent = mg(f.caffeine, state.lang) + ' ' + t.caffeineShort + ' · ' + t.theanineShort;
+    $('[data-pk-side]', scene).textContent = t.packSide;
+    $('[data-pk-stack]', scene).innerHTML = [t.stackCoffee].concat(f.ingredients).map((x) => '<li>' + esc(x) + '.</li>').join('');
+    $('[data-pk-sidemg]', scene).textContent = mg(f.caffeine, state.lang);
+    $('[data-pk-sticker]', scene).textContent = t.packSub;
+    const single = $('[data-pk-single]', scene);
+    single.alt = fill(t.canAlt, { name: f.name });
+    const flavorChanged = f.key !== packFlavor;
+    const modeChanged = mode !== packMode;
+    packFlavor = f.key;
+    packMode = mode;
+    if (mode === 'single') {
+      if (flavorChanged || modeChanged) {
+        single.src = IMG(f.key);
+        const holder = single.parentElement;
+        scene.dataset.mode = 'pack'; void holder.offsetWidth; scene.dataset.mode = 'single';
+      }
+      return;
+    }
+    scene.dataset.mode = 'pack';
+    if (!packShown) { if (reduceMotion) { packShown = true; dropCans(scene, f.key, false); } return; }
+    if (flavorChanged || modeChanged) dropCans(scene, f.key, !reduceMotion);
+  }
+  function revealPack() {
+    if (packShown) return;
+    packShown = true;
+    const scene = $('[data-crate] .scene');
+    if (scene && packMode === 'pack') dropCans(scene, packFlavor, !reduceMotion);
+  }
+  function setupPackTilt(scene) {
+    if (reduceMotion || !window.matchMedia('(pointer: fine)').matches) return;
+    const col = scene.closest('.crate-col') || scene;
+    col.addEventListener('mousemove', (e) => {
+      const r = scene.getBoundingClientRect();
+      const dx = (e.clientX - r.left) / r.width - 0.5;
+      const dy = (e.clientY - r.top) / r.height - 0.5;
+      scene.style.setProperty('--ry', (dx * 26).toFixed(2) + 'deg');
+      scene.style.setProperty('--rx', (dy * -10).toFixed(2) + 'deg');
+    });
+    col.addEventListener('mouseleave', () => { scene.style.setProperty('--ry', '0deg'); scene.style.setProperty('--rx', '0deg'); });
   }
 
   /* ---------- Account ---------- */
@@ -553,6 +641,7 @@
       el.style.setProperty('--py', (((r.top + r.height / 2) - mid) * +el.dataset.par).toFixed(1) + 'px');
     });
 
+    if (!packShown) { const cr = $('[data-crate]').getBoundingClientRect(); if (cr.top < vh * 0.75 && cr.bottom > 0) revealPack(); }
     const counts = $('[data-counts]').getBoundingClientRect();
     if (!countsDone && counts.top < vh * 0.85) runCounts();
     const sw = $('.switch').getBoundingClientRect();
