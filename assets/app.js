@@ -527,6 +527,15 @@
     let scene = $('.scene', host);
     if (!scene) { host.innerHTML = PACK_SHELL; scene = $('.scene', host); setupPackTilt(scene); }
     const mode = p.cans === 1 ? 'single' : 'pack';
+    publishPack({
+      key: f.key, name: f.name, bg: f.bg, ink: f.ink, caffeine: f.caffeine,
+      labelIngredients: FLAVORS[f.key].en.ingredients, labelTag: FLAVORS[f.key].en.tag,
+      cans: p.cans, sub: !!p.monthly,
+      text: {
+        name: f.name + '.', line: t.packLine, mg: mg(f.caffeine, state.lang) + ' ' + t.caffeineShort + ' · ' + t.theanineShort,
+        side: t.packSide, stack: [t.stackCoffee].concat(f.ingredients), sideMg: mg(f.caffeine, state.lang), sticker: t.packSub,
+      },
+    });
     scene.style.setProperty('--c-bg', f.bg);
     scene.style.setProperty('--c-ink', f.ink);
     scene.dataset.sub = p.monthly ? '1' : '0';
@@ -555,9 +564,15 @@
     if (!packShown) { if (reduceMotion) { packShown = true; dropCans(scene, f.key, false); } return; }
     if (flavorChanged || modeChanged) dropCans(scene, f.key, !reduceMotion);
   }
+  function publishPack(data) {
+    window.__bcPack = Object.assign(window.__bcPack || {}, { data: data });
+    try { window.dispatchEvent(new CustomEvent('bcpack')); } catch (e) {}
+  }
   function revealPack() {
     if (packShown) return;
     packShown = true;
+    window.__bcPack = Object.assign(window.__bcPack || {}, { revealed: true });
+    try { window.dispatchEvent(new CustomEvent('bcpack')); } catch (e) {}
     const scene = $('[data-crate] .scene');
     if (scene && packMode === 'pack') dropCans(scene, packFlavor, !reduceMotion);
   }

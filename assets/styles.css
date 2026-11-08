@@ -191,6 +191,10 @@ section[id], main[id] { scroll-margin-top: 90px; }
 .builder { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(28px, 5vw, 90px); align-items: start; }
 .crate-col { position: sticky; top: 110px; display: flex; flex-direction: column; gap: 16px; }
 .crate { position: relative; }
+.pack3d { position: absolute; inset: -8% 0 -2%; opacity: 0; transition: opacity 500ms var(--ease); }
+.pack3d canvas { display: block; width: 100% !important; height: 100% !important; }
+.crate.is-3d .pack3d { opacity: 1; }
+.crate.is-3d .scene { visibility: hidden; }
 .scene { position: relative; container-type: inline-size; height: 0; padding-bottom: 82%; perspective: 1500px; perspective-origin: 50% 30%; --c-bg: #E9DFCC; --c-ink: #1E2B4F; --W: 58cqw; --D: 43.5cqw; --H: 24cqw; --P: 0.5cqw; --R: 7.25cqw; --ry: 0deg; --rx: 0deg; }
 .scene-in { position: absolute; inset: 0; }
 .floor { position: absolute; left: 50%; top: 79%; width: 86cqw; height: 22cqw; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(45, 30, 12, 0.42), rgba(45, 30, 12, 0.16) 55%, transparent); filter: blur(6px); transition: opacity 500ms var(--ease), transform 700ms var(--ease); }
