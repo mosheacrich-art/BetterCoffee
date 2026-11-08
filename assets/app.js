@@ -25,17 +25,17 @@
   const MAX_CAFFEINE = 140;
 
   const PLANS = [
-    { id: 'single', price: 3.49, cans: 1,
+    { id: 'single', price: 2.99, cans: 1,
       en: { name: 'Single can', note: 'One-time purchase' },
       es: { name: 'Lata individual', note: 'Compra única' } },
-    { id: 'pack', price: 37.68, cans: 12, compare: 41.88,
-      en: { name: '12-pack', note: 'One-time purchase', badge: 'Save 10%' },
-      es: { name: 'Pack de 12', note: 'Compra única', badge: 'Ahorra un 10%' } },
-    { id: 'sub', price: 32.03, cans: 12, compare: 41.88, monthly: true,
+    { id: 'pack', price: 29.99, cans: 12, compare: 35.88,
+      en: { name: '12-pack', note: 'One-time purchase', badge: 'Save 16%' },
+      es: { name: 'Pack de 12', note: 'Compra única', badge: 'Ahorra un 16%' } },
+    { id: 'sub', price: 25.49, cans: 12, compare: 35.88, monthly: true,
       en: { name: '12-pack subscription', note: 'Delivered monthly · skip or cancel anytime', badge: 'Best value' },
       es: { name: 'Suscripción pack de 12', note: 'Envío mensual · pausa o cancela cuando quieras', badge: 'Mejor precio' } },
   ];
-  const FROM_PER_CAN = 32.03 / 12;
+  const FROM_PER_CAN = 25.49 / 12;
 
   const COMPARE = {
     en: [
