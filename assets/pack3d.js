@@ -249,18 +249,20 @@
       if (!changed) return;
       const go = () => {
         mode = nextMode;
+        host.classList.toggle('is-3d', mode === 'pack');
         box.visible = mode === 'pack';
-        buildCans(data, mode === 'pack' ? 12 : 1);
+        buildCans(data, mode === 'pack' ? 12 : 0);
+        if (mode !== 'pack') return;
         if (revealed) startDrop(); else hideCans();
       };
-      if (prevKey && revealed && cans.length) startLift(go); else go();
+      if (prevKey && revealed && cans.length && nextMode === 'pack') startLift(go); else go();
     }
 
     function sync(force) {
       const st = window.__bcPack || {};
       if (st.revealed && !revealed) {
         revealed = true;
-        if (current) { buildCans(current, mode === 'pack' ? 12 : 1); startDrop(); }
+        if (current && mode === 'pack') { buildCans(current, 12); startDrop(); }
       }
       if (st.data) apply(st.data, force);
     }
@@ -354,7 +356,7 @@
     const ready = () => {
       sync(true);
       try { renderer.compile(scene, camera); } catch (e) {}
-      host.classList.add('is-3d');
+      host.classList.toggle('is-3d', mode === 'pack');
       loop();
     };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready); else ready();
